@@ -10,7 +10,6 @@ namespace SlugTemplate
     {
         private const string MOD_ID = "olaycolay.jukeboxanywhere";
 
-        // Add hooks
         public void OnEnable()
         {
             On.RainWorld.OnModsInit += Extras.WrapInit(LoadResources);
@@ -35,8 +34,8 @@ namespace SlugTemplate
         {
             if (message == "JUKEBOX")
             {
-                self.manager.RequestMainProcessSwitch(Expedition.ExpeditionEnums.ProcessID.ExpeditionJukebox);
                 self.PlaySound(SoundID.MENU_Switch_Page_Out);
+                self.manager.sideProcesses.Add(new Jukebox(self.manager));
             }
             else
             {
