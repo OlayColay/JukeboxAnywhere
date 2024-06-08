@@ -14,12 +14,32 @@ public class Jukebox : ExpeditionJukebox
     public float targetAlpha;
     public float uAlpha;
 
+    protected FSprite darkSprite;
+
     public Jukebox(ProcessManager manager) : base(manager)
     {
-        //this.pages[0].Container.AddChild(this.darkSprite);
+        this.darkSprite = new FSprite("pixel", true)
+        {
+            color = new Color(0f, 0f, 0f),
+            anchorX = 0f,
+            anchorY = 0f,
+            scaleX = manager.rainWorld.screenSize.x + 2f,
+            scaleY = manager.rainWorld.screenSize.x + 2f,
+            x = -1f,
+            y = -1f,
+            alpha = 0f
+        };
+        this.pages[0].Container.AddChildAtIndex(this.darkSprite, 0);
+
+        this.pages[0].RemoveSubObject(base.scene);
         base.scene.UnloadImages();
         base.scene = null;
 
+        Open();
+    }
+
+    public void Open()
+    {
         opening = true;
         targetAlpha = 1f;
     }
@@ -53,7 +73,7 @@ public class Jukebox : ExpeditionJukebox
         if (opening || closing)
         {
             uAlpha = Mathf.Pow(Mathf.Max(0f, Mathf.Lerp(lastAlpha, currentAlpha, timeStacker)), 1.5f);
-            //darkSprite.alpha = uAlpha * 0.95f;
+            darkSprite.alpha = uAlpha * 0.3f;
         }
         pages[0].pos.y = Mathf.Lerp(manager.rainWorld.options.ScreenSize.y + 100f, 0.01f, (uAlpha < 0.999f) ? uAlpha : 1f);
     }
