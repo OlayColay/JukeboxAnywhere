@@ -2,7 +2,7 @@
     
     <PropertyGroup>
         <TargetFramework>net48</TargetFramework>
-        <LangVersion>11</LangVersion>
+        <LangVersion>preview</LangVersion>
         <DebugType>portable</DebugType>
     </PropertyGroup>
     
@@ -14,14 +14,14 @@
     
     <Target Name="GenerateMod" AfterTargets="PostBuildEvent">
 		<ItemGroup>
-			<RemovePlugins Include="../mod/plugins/*.dll" />
+			<RemovePlugins Include="../jukeboxanywhere/plugins/*.dll" />
 		</ItemGroup>
 		<ItemGroup>
 			<CopyPlugins Include="$(TargetPath)" />
 		</ItemGroup>
 		
         <Delete Files="@(RemovePlugins)" />
-        <Copy SourceFiles="@(CopyPlugins)" DestinationFolder="../mod/newest/plugins/" />
+        <Copy SourceFiles="@(CopyPlugins)" DestinationFolder="../jukeboxanywhere/newest/plugins/" />
     </Target>
     
 </Project>
