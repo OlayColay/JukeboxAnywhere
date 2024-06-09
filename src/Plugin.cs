@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace JukeboxAnywhere
 {
-    [BepInPlugin(MOD_ID, "Jukebox Anywhere", "0.2.0")]
+    [BepInPlugin(MOD_ID, "Jukebox Anywhere", "0.2.1")]
     class Plugin : BaseUnityPlugin
     {
         private const string MOD_ID = "olaycolay.jukeboxanywhere";
@@ -123,6 +123,21 @@ namespace JukeboxAnywhere
                 c.Emit(OpCodes.Ldarg_0); // Load 'this'
                 c.Emit(OpCodes.Isinst, typeof(Jukebox)); // Check if 'this' is a JukeboxAnywhere.Jukebox
                 c.Emit(OpCodes.Brtrue_S, brSLabel); // If 'this' is a JukeboxAnywhere.Jukebox, skip the FadeOutAllSongs call
+
+                // Move cursor before GetRandomJukeboxScene()
+                c.GotoNext(
+                    x => x.MatchLdarg(0),
+                    x => x.MatchCall<ExpeditionJukebox>("GetRandomJukeboxScene")
+                );
+                ILCursor jumpCursor = new ILCursor(c).GotoNext(
+                    x => x.MatchLdarg(0),
+                    x => x.MatchLdstr("Futile_White")
+                );
+                ILLabel jumpLabel = jumpCursor.DefineLabel();
+                jumpCursor.MarkLabel(jumpLabel);
+                c.Emit(OpCodes.Ldarg_0); // Load 'this'
+                c.Emit(OpCodes.Isinst, typeof(Jukebox)); // Check if 'this' is a JukeboxAnywhere.Jukebox
+                c.Emit(OpCodes.Brtrue_S, jumpLabel); // If 'this' is a JukeboxAnywhere.Jukebox, skip the FadeOutAllSongs call
             }
             catch (Exception ex)
             {

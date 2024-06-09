@@ -1,4 +1,5 @@
-﻿using Expedition;
+﻿using BepInEx;
+using Expedition;
 using Menu;
 using System;
 using System.Linq;
@@ -34,10 +35,6 @@ public class Jukebox : ExpeditionJukebox
         };
         this.pages[0].Container.AddChildAtIndex(this.darkSprite, 0);
 
-        this.pages[0].RemoveSubObject(base.scene);
-        base.scene.UnloadImages();
-        base.scene = null;
-
         opening = true;
         targetAlpha = 1f;
 
@@ -48,7 +45,7 @@ public class Jukebox : ExpeditionJukebox
             //RWCustom.Custom.Log("Currently playing song: " + currentSong.name);
             //RWCustom.Custom.Log("Songs:" + string.Join(", ", ExpeditionProgression.GetUnlockedSongs().Select(kv => $"\n{kv.Key}: {kv.Value}")));
             string key = ExpeditionProgression.GetUnlockedSongs().FirstOrDefault(e => e.Value == currentSong.name).Key;
-            if (key != "" && !int.TryParse(key.Substring(key.IndexOf('-')+1), out selectedTrack))
+            if (!key.IsNullOrWhiteSpace() && !int.TryParse(key.Substring(key.IndexOf('-')+1), out selectedTrack))
             {
                 Debug.LogError("JukeboxAnywhere: currently playing track has invalid code (ie. mus-xx)!");
             }
