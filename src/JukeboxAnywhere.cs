@@ -1,5 +1,7 @@
-﻿using Menu;
+﻿using Expedition;
+using Menu;
 using System;
+using System.Linq;
 using UnityEngine;
 
 namespace JukeboxAnywhere;
@@ -36,13 +38,23 @@ public class Jukebox : ExpeditionJukebox
         base.scene.UnloadImages();
         base.scene = null;
 
-        Open();
-    }
-
-    public void Open()
-    {
         opening = true;
         targetAlpha = 1f;
+
+        // Re-select playing track if one is already playing
+        Music.Song currentSong = manager.musicPlayer.song;
+        if (currentSong != null)
+        {
+            //RWCustom.Custom.Log("Currently playing song: " + currentSong.name);
+            //RWCustom.Custom.Log("Songs:" + string.Join(", ", ExpeditionProgression.GetUnlockedSongs().Select(kv => $"\n{kv.Key}: {kv.Value}")));
+            string key = ExpeditionProgression.GetUnlockedSongs().FirstOrDefault(e => e.Value == currentSong.name).Key;
+            if (key != "" && !int.TryParse(key.Substring(key.IndexOf('-')+1), out selectedTrack))
+            {
+                Debug.LogError("JukeboxAnywhere: currently playing track has invalid code (ie. mus-xx)!");
+            }
+            selectedTrack--;
+            this.trackContainer.GoToPlayingTrackPage();
+        }
     }
 
     public override void Update()

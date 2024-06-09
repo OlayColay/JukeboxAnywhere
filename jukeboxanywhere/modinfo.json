@@ -3,7 +3,7 @@
 	"name": "Jukebox Anywhere",
 	"version": "0.1.0",
 	"authors": "OlayColay",
-	"description": "A template for making SlugBase mods.",
+	"description": "Use the Expedition Jukebox during gameplay!",
 	"requirements": [ "expedition" ],
 	"requirements_names": [ "Expedition" ],
 	"tags": [ "Game Mechanics", "Tools" ]
