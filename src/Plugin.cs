@@ -2,6 +2,8 @@
 using System.Linq;
 using BepInEx;
 using Menu;
+using Mono.Cecil.Cil;
+using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
 using UnityEngine;
 
@@ -21,6 +23,15 @@ namespace JukeboxAnywhere
             On.Menu.PauseMenu.Singal += PauseMenu_Singal;
 
             new Hook(typeof(Page).GetProperty(nameof(Page.Selected), System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance).GetGetMethod(), Page_get_Selected);
+
+            try
+            {
+                IL.Menu.ExpeditionJukebox.ctor += ExpeditionJukebox_ctor;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("JukeboxAnywhere: Could not apply ExpeditionJukebox_ctor IL Hook!\n" + ex.Message);
+            }
         }
 
         private void PauseMenu_SpawnExitContinueButtons(On.Menu.PauseMenu.orig_SpawnExitContinueButtons orig, Menu.PauseMenu self)
@@ -51,6 +62,31 @@ namespace JukeboxAnywhere
         private bool Page_get_Selected(Func<Page, bool> orig, Page self)
         {
             return orig(self) && (self.menu is not PauseMenu || !self.menu.manager.sideProcesses.OfType<Jukebox>().Any());
+        }
+
+        private void ExpeditionJukebox_ctor(MonoMod.Cil.ILContext il)
+        {
+            ILCursor c = new(il);
+            ILLabel brSLabel = null;
+
+            try
+            {
+                // Move cursor before manager.musicPlayer.FadeOutAllSongs(1f)
+                c.GotoNext(
+                    x => x.MatchLdarg(1),
+                    x => x.MatchLdfld<ProcessManager>(nameof(ProcessManager.musicPlayer)),
+                    x => x.MatchLdcR4(1),
+                    x => x.MatchCallvirt<Music.MusicPlayer>("FadeOutAllSongs")
+                );
+                new ILCursor(c).GotoNext(x => x.MatchBr(out brSLabel));
+                c.Emit(OpCodes.Ldarg_0); // Load 'this'
+                c.Emit(OpCodes.Isinst, typeof(Jukebox)); // Check if 'this' is a JukeboxAnywhere.Jukebox
+                c.Emit(OpCodes.Brtrue_S, brSLabel); // If 'this' is a JukeboxAnywhere.Jukebox, skip the FadeOutAllSongs call
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("JukeboxAnywhere: Could not emit ExpeditionJukebox_ctor ILs!\n" + ex.Message);
+            }
         }
 
         // Load any resources, such as sprites or sounds
