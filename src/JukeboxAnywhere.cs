@@ -1,6 +1,5 @@
 ﻿using Menu;
 using System;
-using System.Linq;
 using UnityEngine;
 
 namespace JukeboxAnywhere;
@@ -82,11 +81,14 @@ public class Jukebox : ExpeditionJukebox
 
     public override void Singal(MenuObject sender, string message)
     {
-        if (message == "BACK")
+        if (message.StartsWith("BACK"))
         {
             this.closing = true;
             this.targetAlpha = 0f;
-            this.PlaySound(SoundID.MENU_Switch_Page_Out);
+            if (message == "BACK")
+            {
+                this.PlaySound(SoundID.MENU_Switch_Page_Out);
+            }
             return;
         }
         base.Singal(sender, message);

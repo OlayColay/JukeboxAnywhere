@@ -21,6 +21,7 @@ namespace JukeboxAnywhere
             // Put your custom hooks here!
             On.Menu.PauseMenu.SpawnExitContinueButtons += PauseMenu_SpawnExitContinueButtons;
             On.Menu.PauseMenu.Singal += PauseMenu_Singal;
+            On.Menu.PauseMenu.Update += PauseMenu_Update;
 
             new Hook(typeof(Page).GetProperty(nameof(Page.Selected), System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance).GetGetMethod(), Page_get_Selected);
 
@@ -55,6 +56,15 @@ namespace JukeboxAnywhere
             else
             {
                 orig(self, sender, message);
+            }
+        }
+
+        private void PauseMenu_Update(On.Menu.PauseMenu.orig_Update orig, PauseMenu self)
+        {
+            orig(self);
+            if (self.wantToContinue)
+            {
+                self.manager.sideProcesses.OfType<Jukebox>().FirstOrDefault()?.Singal(self.pages[0], "BACK MUTED");
             }
         }
 
