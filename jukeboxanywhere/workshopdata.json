@@ -1,0 +1,18 @@
+{
+  "Title": "Jukebox Anywhere",
+  "Description": "Use the Expedition Jukebox during gameplay! This was an idea originally suggested by Niaveterror815 on the Vinki server, but I think it\u0027s something we\u0027ve all been wanting!",
+  "ID": "olaycolay.jukeboxanywhere",
+  "Version": "0.1.0",
+  "TargetGameVersion": "v1.9.15",
+  "Requirements": "expedition",
+  "RequirementNames": "Expedition",
+  "Authors": "OlayColay",
+  "Visibility": "Unlisted",
+  "Tags": [
+    "Game Mechanics",
+    "Tools"
+  ],
+  "WorkshopID": 3264144524,
+  "UploadFilesOnly": false,
+  "UploadThumbnail": false
+}

@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace JukeboxAnywhere
 {
-    [BepInPlugin(MOD_ID, "Jukebox Anywhere", "0.1.0")]
+    [BepInPlugin(MOD_ID, "Jukebox Anywhere", "0.2.0")]
     class Plugin : BaseUnityPlugin
     {
         private const string MOD_ID = "olaycolay.jukeboxanywhere";
@@ -22,6 +22,9 @@ namespace JukeboxAnywhere
             On.Menu.PauseMenu.SpawnExitContinueButtons += PauseMenu_SpawnExitContinueButtons;
             On.Menu.PauseMenu.Singal += PauseMenu_Singal;
             On.Menu.PauseMenu.Update += PauseMenu_Update;
+
+            On.Menu.MusicTrackButton.ctor += MusicTrackButton_ctor;
+            On.Menu.MusicTrackButton.GrafUpdate += MusicTrackButton_GrafUpdate;
 
             new Hook(typeof(Page).GetProperty(nameof(Page.Selected), System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance).GetGetMethod(), Page_get_Selected);
 
@@ -68,6 +71,34 @@ namespace JukeboxAnywhere
             }
         }
 
+        private void MusicTrackButton_ctor(On.Menu.MusicTrackButton.orig_ctor orig, MusicTrackButton self, Menu.Menu menu, MenuObject owner, string displayText, string singalText, Vector2 pos, Vector2 size, SelectOneButton[] buttonArray, int index)
+        {
+            orig(self, menu, owner, displayText, singalText, pos, size, buttonArray, index);
+            if (self.menu is not Jukebox || JukeboxConfig.RequireExpeditionUnlocks.Value)
+            {
+                return;
+            }
+
+            self.buttonBehav.greyedOut = false;
+            self.trackName.text = Expedition.ExpeditionProgression.TrackName(displayText);
+            self.trackName.label.color = new Color(0.8f, 0.8f, 0.8f);
+            self.sprite.color = new Color(0.8f, 0.8f, 0.8f);
+            for (int i = 9; i < self.roundedRect.sprites.Length; i++)
+            {
+                self.roundedRect.sprites[i].shader = menu.manager.rainWorld.Shaders["MenuTextCustom"];
+            }
+        }
+
+        private void MusicTrackButton_GrafUpdate(On.Menu.MusicTrackButton.orig_GrafUpdate orig, MusicTrackButton self, float timeStacker)
+        {
+            // Reason we don't make unlocked true during the constructor is so that the menu's unlocked counter remains accurate
+            if (self.menu is Jukebox && !JukeboxConfig.RequireExpeditionUnlocks.Value)
+            {
+                self.unlocked = true;
+            }
+            orig(self, timeStacker);
+        }
+
         // Block controls on the pause menu when the Jukebox is showing
         private bool Page_get_Selected(Func<Page, bool> orig, Page self)
         {
@@ -102,6 +133,8 @@ namespace JukeboxAnywhere
         // Load any resources, such as sprites or sounds
         private void LoadResources(RainWorld rainWorld)
         {
+            // Remix menu config
+            JukeboxConfig.RegisterOI();
         }
     }
 }
