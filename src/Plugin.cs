@@ -5,7 +5,7 @@ using Menu;
 using MonoMod.RuntimeDetour;
 using UnityEngine;
 
-namespace SlugTemplate
+namespace JukeboxAnywhere
 {
     [BepInPlugin(MOD_ID, "Jukebox Anywhere", "0.1.0")]
     class Plugin : BaseUnityPlugin
@@ -27,7 +27,7 @@ namespace SlugTemplate
         {
             orig(self);
 
-            RWCustom.Custom.Log("Spawning jukebox button");
+            RWCustom.Custom.Log("JukeboxAnywhere: Spawning jukebox button");
             SymbolButton jukeBoxButton = new(self, self.pages[0], "musicSymbol", "JUKEBOX", new Vector2(100f, self.continueButton.pos.y));
             jukeBoxButton.roundedRect.size = new(50f, 50f);
             jukeBoxButton.size = jukeBoxButton.roundedRect.size;
@@ -39,7 +39,6 @@ namespace SlugTemplate
             if (message == "JUKEBOX")
             {
                 self.PlaySound(SoundID.MENU_Switch_Page_Out);
-                self.pages[0].toggled = false;
                 self.manager.sideProcesses.Add(new Jukebox(self.manager));
             }
             else
@@ -48,6 +47,7 @@ namespace SlugTemplate
             }
         }
 
+        // Block controls on the pause menu when the Jukebox is showing
         private bool Page_get_Selected(Func<Page, bool> orig, Page self)
         {
             return orig(self) && (self.menu is not PauseMenu || !self.menu.manager.sideProcesses.OfType<Jukebox>().Any());

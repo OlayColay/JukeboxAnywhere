@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using UnityEngine;
 
+namespace JukeboxAnywhere;
 public class Jukebox : ExpeditionJukebox
 {
     public bool opening;
@@ -18,6 +19,7 @@ public class Jukebox : ExpeditionJukebox
 
     public Jukebox(ProcessManager manager) : base(manager)
     {
+        // Black background
         this.darkSprite = new FSprite("pixel", true)
         {
             color = new Color(0f, 0f, 0f),
@@ -47,8 +49,8 @@ public class Jukebox : ExpeditionJukebox
     public override void Update()
     {
         base.Update();
-        Debug.Log("Selectables: " + pages[0].selectables.Count() + "\tSubObjects: " + pages[0].subObjects.Count());
-        base.Update();
+
+        // Update alpha and opening/closing status
         lastAlpha = currentAlpha;
         currentAlpha = Mathf.Lerp(currentAlpha, targetAlpha, 0.2f);
         if (opening && pages[0].pos.y <= 0.01f)
