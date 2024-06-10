@@ -2,7 +2,7 @@
   "Title": "Jukebox Anywhere",
   "Description": "Use the Expedition Jukebox during gameplay! This was an idea originally suggested by Niaveterror815 on the Vinki server, but I think it\u0027s something we\u0027ve all been wanting!",
   "ID": "olaycolay.jukeboxanywhere",
-  "Version": "0.2.0",
+  "Version": "0.3.0",
   "TargetGameVersion": "v1.9.15",
   "Requirements": "expedition",
   "RequirementNames": "Expedition",

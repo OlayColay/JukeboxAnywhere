@@ -10,6 +10,7 @@ namespace JukeboxAnywhere
     {
         public static JukeboxConfig Instance { get; } = new();
         public static Configurable<bool> RequireExpeditionUnlocks;
+        public static Configurable<bool> ModdedSongs;
 
         public JukeboxConfig()
         {
@@ -17,12 +18,16 @@ namespace JukeboxAnywhere
             [
                 "Require Expedition Unlocks for Songs"
             ]));
+            ModdedSongs = config.Bind("moddedSongs", true, new ConfigurableInfo("Enable modded songs to be playable from Jukebox.", tags:
+            [
+                "Enable Modded Songs"
+            ]));
         }
 
         public static void RegisterOI()
         {
-            if (MachineConnector.GetRegisteredOI("olaycolay.jukeboxanywhere") != Instance)
-                MachineConnector.SetRegisteredOI("olaycolay.jukeboxanywhere", Instance);
+            if (MachineConnector.GetRegisteredOI(Plugin.MOD_ID) != Instance)
+                MachineConnector.SetRegisteredOI(Plugin.MOD_ID, Instance);
         }
 
         // Called when the config menu is opened by the player.
@@ -39,6 +44,7 @@ namespace JukeboxAnywhere
             AddTitle(0);
             AddDivider(557f);
             AddCheckbox(RequireExpeditionUnlocks, 520f);
+            AddCheckbox(ModdedSongs, 480f);
         }
 
         // Combines two flipped 'LinearGradient200's together to make a fancy looking divider.

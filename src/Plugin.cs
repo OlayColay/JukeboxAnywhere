@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using BepInEx;
 using Menu;
@@ -9,10 +11,12 @@ using UnityEngine;
 
 namespace JukeboxAnywhere
 {
-    [BepInPlugin(MOD_ID, "Jukebox Anywhere", "0.2.1")]
+    [BepInPlugin(MOD_ID, "Jukebox Anywhere", "0.3.0")]
     class Plugin : BaseUnityPlugin
     {
-        private const string MOD_ID = "olaycolay.jukeboxanywhere";
+        public const string MOD_ID = "olaycolay.jukeboxanywhere";
+
+        public static string[] songNames;
 
         public void OnEnable()
         {
@@ -25,6 +29,8 @@ namespace JukeboxAnywhere
 
             On.Menu.MusicTrackButton.ctor += MusicTrackButton_ctor;
             On.Menu.MusicTrackButton.GrafUpdate += MusicTrackButton_GrafUpdate;
+
+            On.Expedition.ExpeditionProgression.GetUnlockedSongs += ExpeditionProgression_GetUnlockedSongs;
 
             new Hook(typeof(Page).GetProperty(nameof(Page.Selected), System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance).GetGetMethod(), Page_get_Selected);
 
@@ -74,11 +80,19 @@ namespace JukeboxAnywhere
         private void MusicTrackButton_ctor(On.Menu.MusicTrackButton.orig_ctor orig, MusicTrackButton self, Menu.Menu menu, MenuObject owner, string displayText, string singalText, Vector2 pos, Vector2 size, SelectOneButton[] buttonArray, int index)
         {
             orig(self, menu, owner, displayText, singalText, pos, size, buttonArray, index);
-            if (self.menu is not Jukebox || JukeboxConfig.RequireExpeditionUnlocks.Value)
+
+            int vanillaSongCount = ModManager.MSC ? 124 : 81;
+            // If this is a modded song it should be unlocked
+            if (self.buttonArrayIndex >= vanillaSongCount)
+            {
+                self.unlocked = true;
+            }
+            else if (self.menu is not Jukebox || JukeboxConfig.RequireExpeditionUnlocks.Value)
             {
                 return;
             }
 
+            // Act like an unlocked song
             self.buttonBehav.greyedOut = false;
             self.trackName.text = Expedition.ExpeditionProgression.TrackName(displayText);
             self.trackName.label.color = new Color(0.8f, 0.8f, 0.8f);
@@ -97,6 +111,25 @@ namespace JukeboxAnywhere
                 self.unlocked = true;
             }
             orig(self, timeStacker);
+        }
+
+        private Dictionary<string, string> ExpeditionProgression_GetUnlockedSongs(On.Expedition.ExpeditionProgression.orig_GetUnlockedSongs orig)
+        {
+            Dictionary<string, string> songs = orig();
+
+            if (JukeboxConfig.ModdedSongs.Value)
+            {
+                int initialCount = songs.Count + 1;
+                for (int i = 0; i < songNames.Count(); i++) 
+                {
+                    if (!songs.ContainsValue(songNames[i]))
+                    { 
+                        songs["mus-" + Menu.Remix.ValueConverter.ConvertToString(i + initialCount)] = songNames[i];
+                    }
+                }
+            }
+
+            return songs;
         }
 
         // Block controls on the pause menu when the Jukebox is showing
@@ -150,6 +183,9 @@ namespace JukeboxAnywhere
         {
             // Remix menu config
             JukeboxConfig.RegisterOI();
+
+            // Load list of songs in music folder
+            songNames = Directory.EnumerateFiles(AssetManager.ResolveDirectory("music" + Path.DirectorySeparatorChar.ToString() + "songs")).Select(Path.GetFileNameWithoutExtension).ToArray();
         }
     }
 }
