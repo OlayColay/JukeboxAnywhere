@@ -30,6 +30,8 @@ namespace JukeboxAnywhere
             On.Menu.MusicTrackButton.ctor += MusicTrackButton_ctor;
             On.Menu.MusicTrackButton.GrafUpdate += MusicTrackButton_GrafUpdate;
 
+            On.Music.MultiplayerDJ.PlayNext += MultiplayerDJ_PlayNext;
+
             On.Expedition.ExpeditionProgression.GetUnlockedSongs += ExpeditionProgression_GetUnlockedSongs;
 
             new Hook(typeof(Page).GetProperty(nameof(Page.Selected), System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance).GetGetMethod(), Page_get_Selected);
@@ -130,6 +132,15 @@ namespace JukeboxAnywhere
             }
 
             return songs;
+        }
+
+        // Un-randomize Arena song when playing from Jukebox
+        private void MultiplayerDJ_PlayNext(On.Music.MultiplayerDJ.orig_PlayNext orig, Music.MultiplayerDJ self, float fadeInTime)
+        {
+            if (!self.musicPlayer.manager.sideProcesses.OfType<Jukebox>().Any())
+            {
+                orig(self, fadeInTime);
+            }
         }
 
         // Block controls on the pause menu when the Jukebox is showing
