@@ -52,6 +52,8 @@ public class Jukebox : ExpeditionJukebox
             selectedTrack--;
             this.trackContainer.GoToPlayingTrackPage();
         }
+
+        pages[0].pos.y = manager.rainWorld.options.ScreenSize.y + 100f;
     }
 
     public override void Update()
@@ -84,6 +86,7 @@ public class Jukebox : ExpeditionJukebox
         {
             uAlpha = Mathf.Pow(Mathf.Max(0f, Mathf.Lerp(lastAlpha, currentAlpha, timeStacker)), 1.5f);
             darkSprite.alpha = uAlpha * 0.3f;
+            jukeboxLogo.y = pages[0].pos.y + 618f;
         }
         pages[0].pos.y = Mathf.Lerp(manager.rainWorld.options.ScreenSize.y + 100f, 0.01f, (uAlpha < 0.999f) ? uAlpha : 1f);
     }

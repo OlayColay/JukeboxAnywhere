@@ -111,6 +111,17 @@ namespace JukeboxAnywhere
                 self.unlocked = true;
             }
             orig(self, timeStacker);
+
+            if (self.menu is not Jukebox)
+            {
+                return;
+            }
+            Jukebox j = self.menu as Jukebox;
+
+            if (j.opening || j.closing)
+            {
+                self.sprite.y = (self.owner as MusicTrackContainer).pos.y + self.pos.y + self.menu.pages[0].pos.y + 25f;
+            }
         }
 
         private Dictionary<string, string> ExpeditionProgression_GetUnlockedSongs(On.Expedition.ExpeditionProgression.orig_GetUnlockedSongs orig)
