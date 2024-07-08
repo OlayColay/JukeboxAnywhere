@@ -61,6 +61,8 @@ public class JukeboxAnywhereButton : SimpleButton
         else
         {
             SetSize(new Vector2(50f, 50f));
+            menuLabel.text = "";
+            trackName.text = "";
         }
     }
 
