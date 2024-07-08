@@ -45,11 +45,18 @@ public class Jukebox : ExpeditionJukebox
             //RWCustom.Custom.Log("Currently playing song: " + currentSong.name);
             //RWCustom.Custom.Log("Songs:" + string.Join(", ", ExpeditionProgression.GetUnlockedSongs().Select(kv => $"\n{kv.Key}: {kv.Value}")));
             string key = ExpeditionProgression.GetUnlockedSongs().FirstOrDefault(e => e.Value == currentSong.name).Key;
-            if (!key.IsNullOrWhiteSpace() && !int.TryParse(key.Substring(key.IndexOf('-')+1), out selectedTrack))
+            if (key.IsNullOrWhiteSpace())
             {
-                Debug.LogError("JukeboxAnywhere: currently playing track has invalid code (ie. mus-xx)!");
+                selectedTrack = 0;
             }
-            selectedTrack--;
+            else if (!int.TryParse(key.Substring(key.IndexOf('-') + 1), out selectedTrack))
+            {
+                RWCustom.Custom.LogImportant("JukeboxAnywhere: currently playing track has invalid code (ie. mus-xx)!");
+            }
+            else
+            {
+                selectedTrack--;
+            }
             this.trackContainer.GoToPlayingTrackPage();
         }
 

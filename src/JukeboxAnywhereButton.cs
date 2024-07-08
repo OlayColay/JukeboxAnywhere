@@ -28,7 +28,7 @@ public class JukeboxAnywhereButton : SimpleButton
         this.menuLabel.label.alignment = FLabelAlignment.Left;
         this.menuLabel.pos = new Vector2(-70f, 10f);
         this.menuLabel.label.color = this.trackColor;
-        this.trackName = new MenuLabel(menu, this, currentSong != null ? ExpeditionProgression.TrackName(songList[songNum-1]) : "", new Vector2(53f, 16f), default, false, null);
+        this.trackName = new MenuLabel(menu, this, (currentSong != null && songNum > 0) ? ExpeditionProgression.TrackName(songList[songNum]) : "", new Vector2(53f, 16f), default, false, null);
         this.trackName.label.alignment = FLabelAlignment.Left;
         this.trackName.label.color = this.nameColor;
         this.subObjects.Add(this.trackName);
@@ -53,10 +53,10 @@ public class JukeboxAnywhereButton : SimpleButton
     {
         base.Update();
         UpdateCurrentSong();
-        if (currentSong != null)
+        if (currentSong != null && songNum >= 0)
         {
             SetSize(new Vector2(240f, 50f));
-            trackName.text = ExpeditionProgression.TrackName(songList[songNum - 1]);
+            trackName.text = ExpeditionProgression.TrackName(songList[songNum]);
         }
         else
         {
@@ -79,6 +79,7 @@ public class JukeboxAnywhereButton : SimpleButton
 
         if (this.currentSong != null)
         {
+            // spin disc even if the song playing doesn't have a display name (like the short atmoshperic songs)
             this.sprite.rotation += 150f * Time.deltaTime;
             if (this.sprite.element.name != "mediadisc")
             {
@@ -110,7 +111,7 @@ public class JukeboxAnywhereButton : SimpleButton
             int selectedTrack = 0;
             if (!key.IsNullOrWhiteSpace() && !int.TryParse(key.Substring(key.IndexOf('-') + 1), out selectedTrack))
             {
-                Debug.LogError("JukeboxAnywhere: currently playing track has invalid code (ie. mus-xx)!");
+                Custom.LogImportant("JukeboxAnywhere: currently playing track has invalid code (ie. mus-xx)!");
             }
 
             if (selectedTrack > 0)
@@ -118,7 +119,7 @@ public class JukeboxAnywhereButton : SimpleButton
                 this.menuLabel.label.text = menu.Translate("Track:") + " " + selectedTrack.ToString();
             }
 
-            songNum = selectedTrack;
+            songNum = selectedTrack - 1;
         }
     }
 }
