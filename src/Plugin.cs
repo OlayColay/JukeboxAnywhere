@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace JukeboxAnywhere
 {
-    [BepInPlugin(MOD_ID, "Jukebox Anywhere", "1.0.0")]
+    [BepInPlugin(MOD_ID, "Jukebox Anywhere", "1.0.1")]
     class Plugin : BaseUnityPlugin
     {
         public const string MOD_ID = "olaycolay.jukeboxanywhere";
@@ -33,6 +33,8 @@ namespace JukeboxAnywhere
 
             On.Menu.MusicTrackButton.ctor += MusicTrackButton_ctor;
             On.Menu.MusicTrackButton.GrafUpdate += MusicTrackButton_GrafUpdate;
+
+            On.Menu.MusicTrackContainer.ctor += MusicTrackContainer_ctor;
 
             On.Music.MultiplayerDJ.PlayNext += MultiplayerDJ_PlayNext;
 
@@ -125,6 +127,17 @@ namespace JukeboxAnywhere
             if (j.opening || j.closing)
             {
                 self.sprite.y = (self.owner as MusicTrackContainer).pos.y + self.pos.y + self.menu.pages[0].pos.y + 25f;
+            }
+        }
+
+        private void MusicTrackContainer_ctor(On.Menu.MusicTrackContainer.orig_ctor orig, MusicTrackContainer self, Menu.Menu menu, MenuObject owner, Vector2 pos, List<string> trackFilenames)
+        {
+            orig(self, menu, owner, pos, trackFilenames);
+
+            if (self.trackList.Length > 0 && self.trackList.Length % 10 == 0)
+            {
+                // For some reason, having a multiple of 10 songs in the trackList creates an extra empty page. This prevents that
+                self.maxPages--;
             }
         }
 
