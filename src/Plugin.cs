@@ -46,14 +46,12 @@ namespace JukeboxAnywhere
             }
         }
 
-        private void PauseMenu_SpawnExitContinueButtons(On.Menu.PauseMenu.orig_SpawnExitContinueButtons orig, Menu.PauseMenu self)
+        private void PauseMenu_SpawnExitContinueButtons(On.Menu.PauseMenu.orig_SpawnExitContinueButtons orig, PauseMenu self)
         {
             orig(self);
 
             RWCustom.Custom.Log("JukeboxAnywhere: Spawning jukebox button");
-            SymbolButton jukeBoxButton = new(self, self.pages[0], "musicSymbol", "JUKEBOX", new Vector2(100f, self.continueButton.pos.y));
-            jukeBoxButton.roundedRect.size = new(50f, 50f);
-            jukeBoxButton.size = jukeBoxButton.roundedRect.size;
+            JukeboxAnywhereButton jukeBoxButton = new(self, self.pages[0], new Vector2(100f, self.continueButton.pos.y));
             self.pages[0].subObjects.Add(jukeBoxButton);
         }
 
