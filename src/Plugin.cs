@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using BepInEx;
+using BepInEx.Logging;
 using Menu;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
@@ -15,11 +16,14 @@ namespace JukeboxAnywhere
     class Plugin : BaseUnityPlugin
     {
         public const string MOD_ID = "olaycolay.jukeboxanywhere";
+        public static ManualLogSource JLogger;
 
         public static string[] songNames;
 
         public void OnEnable()
         {
+            JLogger = Logger;
+
             On.RainWorld.OnModsInit += Extras.WrapInit(LoadResources);
 
             // Put your custom hooks here!
@@ -205,7 +209,7 @@ namespace JukeboxAnywhere
             JukeboxConfig.RegisterOI();
 
             // Load list of songs in music folder
-            songNames = Directory.EnumerateFiles(AssetManager.ResolveDirectory("music" + Path.DirectorySeparatorChar.ToString() + "songs")).Select(Path.GetFileNameWithoutExtension).ToArray();
+            songNames = AssetManager.ListDirectory("music" + Path.DirectorySeparatorChar.ToString() + "songs", false, false, true).Select(Path.GetFileNameWithoutExtension).ToArray();
         }
     }
 }
