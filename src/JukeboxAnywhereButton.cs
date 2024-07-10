@@ -10,13 +10,13 @@ using System.Linq;
 namespace JukeboxAnywhere;
 public class JukeboxAnywhereButton : SimpleButton
 {
-    string[] songList;
+    readonly string[] songList;
     Song currentSong;
     int songNum;
     Color nameColor = Color.white;
     Color trackColor = Color.white;
-    MenuLabel trackName;
-    FSprite sprite = new("Futile_White", true);
+    readonly MenuLabel trackName;
+    readonly FSprite sprite = new("Futile_White", true);
 
 	public JukeboxAnywhereButton(Menu.Menu menu, MenuObject owner, Vector2 pos)
 		: base(menu, owner, "", "JUKEBOX", pos, new(50f, 50f))

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using BepInEx;
@@ -12,13 +13,14 @@ using UnityEngine;
 
 namespace JukeboxAnywhere
 {
-    [BepInPlugin(MOD_ID, "Jukebox Anywhere", "1.0.2")]
+    [BepInPlugin(MOD_ID, "Jukebox Anywhere", "1.1.0")]
     class Plugin : BaseUnityPlugin
     {
         public const string MOD_ID = "olaycolay.jukeboxanywhere";
         public static ManualLogSource JLogger;
 
-        public static string[] songNames;
+        public static string[] modSongNames;
+        public static HashSet<string> regionAcronyms;
 
         public void OnEnable()
         {
@@ -39,6 +41,7 @@ namespace JukeboxAnywhere
             On.Music.MultiplayerDJ.PlayNext += MultiplayerDJ_PlayNext;
 
             On.Expedition.ExpeditionProgression.GetUnlockedSongs += ExpeditionProgression_GetUnlockedSongs;
+            On.Expedition.ExpeditionProgression.TrackName += ExpeditionProgression_TrackName;
 
             new Hook(typeof(Page).GetProperty(nameof(Page.Selected), System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance).GetGetMethod(), Page_get_Selected);
 
@@ -50,6 +53,17 @@ namespace JukeboxAnywhere
             {
                 Debug.LogError("JukeboxAnywhere: Could not apply ExpeditionJukebox_ctor IL Hook!\n" + ex.Message);
             }
+        }
+
+        private string ExpeditionProgression_TrackName(On.Expedition.ExpeditionProgression.orig_TrackName orig, string filename)
+        {
+            string text = orig(filename);
+
+            if (JukeboxConfig.CleanSongNames.Value)
+            {
+                return ConvertToTitleCase(text);
+            }
+            return text;
         }
 
         private void PauseMenu_SpawnExitContinueButtons(On.Menu.PauseMenu.orig_SpawnExitContinueButtons orig, PauseMenu self)
@@ -148,11 +162,11 @@ namespace JukeboxAnywhere
             if (JukeboxConfig.ModdedSongs.Value)
             {
                 int initialCount = songs.Count + 1;
-                for (int i = 0; i < songNames.Count(); i++) 
+                for (int i = 0; i < modSongNames.Count(); i++) 
                 {
-                    if (!songs.ContainsValue(songNames[i]))
+                    if (!songs.ContainsValue(modSongNames[i]))
                     { 
-                        songs["mus-" + Menu.Remix.ValueConverter.ConvertToString(i + initialCount)] = songNames[i];
+                        songs["mus-" + Menu.Remix.ValueConverter.ConvertToString(i + initialCount)] = modSongNames[i];
                     }
                 }
             }
@@ -222,7 +236,62 @@ namespace JukeboxAnywhere
             JukeboxConfig.RegisterOI();
 
             // Load list of songs in music folder
-            songNames = AssetManager.ListDirectory("music" + Path.DirectorySeparatorChar.ToString() + "songs", false, false, true).Select(Path.GetFileNameWithoutExtension).ToArray();
+            modSongNames = AssetManager.ListDirectory("music" + Path.DirectorySeparatorChar.ToString() + "songs", false, false, true)
+                .Where(file => file.EndsWith(".mp3", StringComparison.OrdinalIgnoreCase) || file.EndsWith(".ogg", StringComparison.OrdinalIgnoreCase))
+                .Select(Path.GetFileNameWithoutExtension).ToArray();
+
+            // Get region acronyms
+            string text = AssetManager.ResolveFilePath("World" + Path.DirectorySeparatorChar.ToString() + "regions.txt");
+            if (File.Exists(text))
+            {
+                regionAcronyms = File.ReadAllLines(text).ToHashSet<string>();
+            }
+            else
+            {
+                regionAcronyms = ["No Regions"];
+            }
+        }
+
+        // Define a list of words that should not be capitalized in a title
+        readonly static HashSet<string> lowercaseWords = ["a", "and", "as", "at", "but", "by", "for", "from", "if", "in", "into", "nor", "of", "off",
+            "on", "once", "onto", "or", "over", "so", "than", "that", "to", "upon", "when", "with", "yet"];
+        public static string ConvertToTitleCase(string text)
+        {
+            if (text.IsNullOrWhiteSpace())
+            {
+                return text;
+            }
+
+            // Replace underscores with spaces and split the string into words
+            string[] words = text.Replace('_', ' ').Split(' ');
+
+            // Capitalize the first letter of each word, except the ones in the lowercaseWords list and region acronyms
+            for (int i = 0; i < words.Length; i++)
+            {
+                if (words[i].IsNullOrWhiteSpace())
+                {
+                    continue;
+                }
+                
+                if (regionAcronyms.Contains(words[i].ToUpper()))
+                {
+                    words[i] = words[i].ToUpper();
+                }
+                if (i == 0 || !lowercaseWords.Contains(words[i].ToLower()))
+                {
+                    char[] characters = words[i].ToCharArray();
+                    // Check if the first character is a letter
+                    if (char.IsLetter(characters[0]))
+                    {
+                        // Capitalize the first letter
+                        characters[0] = char.ToUpper(characters[0]);
+                    }
+                    words[i] = new string(characters);
+                }
+            }
+
+            // Reconstruct the string
+            return string.Join(" ", words);
         }
     }
 }

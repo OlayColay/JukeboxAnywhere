@@ -11,6 +11,7 @@ namespace JukeboxAnywhere
         public static JukeboxConfig Instance { get; } = new();
         public static Configurable<bool> RequireExpeditionUnlocks;
         public static Configurable<bool> ModdedSongs;
+        public static Configurable<bool> CleanSongNames;
 
         public JukeboxConfig()
         {
@@ -21,6 +22,10 @@ namespace JukeboxAnywhere
             ModdedSongs = config.Bind("moddedSongs", true, new ConfigurableInfo("Enable modded songs to be playable from Jukebox.", tags:
             [
                 "Enable Modded Songs"
+            ]));
+            CleanSongNames = config.Bind("cleanSongNames", true, new ConfigurableInfo("Attempt to fix capitalization and remove underscores from song names on the Jukebox", tags:
+            [
+                "Clean Song Names"
             ]));
         }
 
@@ -45,6 +50,7 @@ namespace JukeboxAnywhere
             AddDivider(557f);
             AddCheckbox(RequireExpeditionUnlocks, 520f);
             AddCheckbox(ModdedSongs, 480f);
+            AddCheckbox(CleanSongNames, 440f);
         }
 
         // Combines two flipped 'LinearGradient200's together to make a fancy looking divider.
