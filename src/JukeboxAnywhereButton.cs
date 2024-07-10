@@ -28,7 +28,7 @@ public class JukeboxAnywhereButton : SimpleButton
         this.menuLabel.label.alignment = FLabelAlignment.Left;
         this.menuLabel.pos = new Vector2(-70f, 10f);
         this.menuLabel.label.color = this.trackColor;
-        this.trackName = new MenuLabel(menu, this, (currentSong != null && songNum > 0) ? ExpeditionProgression.TrackName(songList[songNum]) : "", new Vector2(53f, 16f), default, false, null);
+        this.trackName = new MenuLabel(menu, this, (currentSong != null && songNum >= 0) ? ExpeditionProgression.TrackName(songList[songNum]) : "", new Vector2(53f, 16f), default, false, null);
         this.trackName.label.alignment = FLabelAlignment.Left;
         this.trackName.label.color = this.nameColor;
         this.subObjects.Add(this.trackName);
@@ -53,7 +53,7 @@ public class JukeboxAnywhereButton : SimpleButton
     {
         base.Update();
         UpdateCurrentSong();
-        if (currentSong != null && songNum >= 0)
+        if (currentSong != null && songNum >= 0 && songNum < songList.Length)
         {
             SetSize(new Vector2(240f, 50f));
             trackName.text = ExpeditionProgression.TrackName(songList[songNum]);
