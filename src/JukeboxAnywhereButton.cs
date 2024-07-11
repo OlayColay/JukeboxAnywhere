@@ -104,7 +104,7 @@ public class JukeboxAnywhereButton : SimpleButton
 
     public void UpdateCurrentSong()
     {
-        currentSong = menu.manager.musicPlayer.song;
+        currentSong = menu.manager.musicPlayer?.song;
         if (currentSong != null)
         {
             string key = ExpeditionProgression.GetUnlockedSongs().FirstOrDefault(e => e.Value == currentSong.name).Key;
