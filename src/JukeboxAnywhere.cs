@@ -6,7 +6,7 @@ using System.Linq;
 using UnityEngine;
 
 namespace JukeboxAnywhere;
-public class Jukebox : ExpeditionJukebox
+public class JukeboxAnywhere : ExpeditionJukebox
 {
     public bool opening;
     public bool closing;
@@ -19,8 +19,13 @@ public class Jukebox : ExpeditionJukebox
 
     protected FSprite darkSprite;
 
-    public Jukebox(ProcessManager manager) : base(manager)
+    public JukeboxAnywhere(ProcessManager manager) : base(manager)
     {
+        // Create new JukeboxManager
+        manager.sideProcesses.Add(new JukeboxManager(manager));
+        this.repeat = JukeboxManager.repeatAnywhere;
+        this.shuffle = JukeboxManager.shuffleAnywhere;
+
         // Black background
         this.darkSprite = new FSprite("pixel", true)
         {
@@ -110,6 +115,15 @@ public class Jukebox : ExpeditionJukebox
             }
             return;
         }
+        else if (message == "REPEAT")
+        {
+            JukeboxManager.repeatAnywhere = !JukeboxManager.repeatAnywhere;
+        }
+        else if (message == "SHUFFLE")
+        {
+            JukeboxManager.shuffleAnywhere = !JukeboxManager.shuffleAnywhere;
+        }
+
         base.Singal(sender, message);
     }
 }

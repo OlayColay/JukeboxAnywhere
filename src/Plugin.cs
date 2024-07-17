@@ -80,7 +80,7 @@ namespace JukeboxAnywhere
             if (message == "JUKEBOX")
             {
                 self.PlaySound(SoundID.MENU_Switch_Page_Out);
-                self.manager.sideProcesses.Add(new Jukebox(self.manager));
+                self.manager.sideProcesses.Add(new JukeboxAnywhere(self.manager));
             }
             else
             {
@@ -93,7 +93,7 @@ namespace JukeboxAnywhere
             orig(self);
             if (self.wantToContinue)
             {
-                self.manager.sideProcesses.OfType<Jukebox>().FirstOrDefault()?.Singal(self.pages[0], "BACK MUTED");
+                self.manager.sideProcesses.OfType<JukeboxAnywhere>().FirstOrDefault()?.Singal(self.pages[0], "BACK MUTED");
             }
         }
 
@@ -107,7 +107,7 @@ namespace JukeboxAnywhere
             {
                 self.unlocked = true;
             }
-            else if (self.menu is not Jukebox || JukeboxConfig.RequireExpeditionUnlocks.Value)
+            else if (self.menu is not JukeboxAnywhere || JukeboxConfig.RequireExpeditionUnlocks.Value)
             {
                 return;
             }
@@ -126,17 +126,17 @@ namespace JukeboxAnywhere
         private void MusicTrackButton_GrafUpdate(On.Menu.MusicTrackButton.orig_GrafUpdate orig, MusicTrackButton self, float timeStacker)
         {
             // Reason we don't make unlocked true during the constructor is so that the menu's unlocked counter remains accurate
-            if (self.menu is Jukebox && !JukeboxConfig.RequireExpeditionUnlocks.Value)
+            if (self.menu is JukeboxAnywhere && !JukeboxConfig.RequireExpeditionUnlocks.Value)
             {
                 self.unlocked = true;
             }
             orig(self, timeStacker);
 
-            if (self.menu is not Jukebox)
+            if (self.menu is not JukeboxAnywhere)
             {
                 return;
             }
-            Jukebox j = self.menu as Jukebox;
+            JukeboxAnywhere j = self.menu as JukeboxAnywhere;
 
             if (j.opening || j.closing)
             {
@@ -177,7 +177,7 @@ namespace JukeboxAnywhere
         // Un-randomize Arena song when playing from Jukebox
         private void MultiplayerDJ_PlayNext(On.Music.MultiplayerDJ.orig_PlayNext orig, Music.MultiplayerDJ self, float fadeInTime)
         {
-            if (!self.musicPlayer.manager.sideProcesses.OfType<Jukebox>().Any())
+            if (!self.musicPlayer.manager.sideProcesses.OfType<JukeboxAnywhere>().Any())
             {
                 orig(self, fadeInTime);
             }
@@ -186,7 +186,7 @@ namespace JukeboxAnywhere
         // Block controls on the pause menu when the Jukebox is showing
         private bool Page_get_Selected(Func<Page, bool> orig, Page self)
         {
-            return orig(self) && (self.menu is not PauseMenu || !self.menu.manager.sideProcesses.OfType<Jukebox>().Any());
+            return orig(self) && (self.menu is not PauseMenu || !self.menu.manager.sideProcesses.OfType<JukeboxAnywhere>().Any());
         }
 
         private void ExpeditionJukebox_ctor(MonoMod.Cil.ILContext il)
@@ -205,7 +205,7 @@ namespace JukeboxAnywhere
                 );
                 new ILCursor(c).GotoNext(x => x.MatchBr(out brSLabel));
                 c.Emit(OpCodes.Ldarg_0); // Load 'this'
-                c.Emit(OpCodes.Isinst, typeof(Jukebox)); // Check if 'this' is a JukeboxAnywhere.Jukebox
+                c.Emit(OpCodes.Isinst, typeof(JukeboxAnywhere)); // Check if 'this' is a JukeboxAnywhere.Jukebox
                 c.Emit(OpCodes.Brtrue_S, brSLabel); // If 'this' is a JukeboxAnywhere.Jukebox, skip the FadeOutAllSongs call
 
                 // Move cursor before GetRandomJukeboxScene()
@@ -220,7 +220,7 @@ namespace JukeboxAnywhere
                 ILLabel jumpLabel = jumpCursor.DefineLabel();
                 jumpCursor.MarkLabel(jumpLabel);
                 c.Emit(OpCodes.Ldarg_0); // Load 'this'
-                c.Emit(OpCodes.Isinst, typeof(Jukebox)); // Check if 'this' is a JukeboxAnywhere.Jukebox
+                c.Emit(OpCodes.Isinst, typeof(JukeboxAnywhere)); // Check if 'this' is a JukeboxAnywhere.Jukebox
                 c.Emit(OpCodes.Brtrue_S, jumpLabel); // If 'this' is a JukeboxAnywhere.Jukebox, skip the FadeOutAllSongs call
             }
             catch (Exception ex)
