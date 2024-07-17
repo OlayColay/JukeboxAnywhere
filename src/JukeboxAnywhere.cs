@@ -22,7 +22,7 @@ public class JukeboxAnywhere : ExpeditionJukebox
     public JukeboxAnywhere(ProcessManager manager) : base(manager)
     {
         // Create new JukeboxManager
-        manager.sideProcesses.Add(new JukeboxManager(manager));
+        manager.sideProcesses.Add(new JukeboxManager(manager, this.songList));
         this.repeat = JukeboxManager.repeatAnywhere;
         this.shuffle = JukeboxManager.shuffleAnywhere;
 

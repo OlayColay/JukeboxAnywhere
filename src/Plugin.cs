@@ -244,7 +244,7 @@ namespace JukeboxAnywhere
             string text = AssetManager.ResolveFilePath("World" + Path.DirectorySeparatorChar.ToString() + "regions.txt");
             if (File.Exists(text))
             {
-                regionAcronyms = File.ReadAllLines(text).ToHashSet<string>();
+                regionAcronyms = [.. File.ReadAllLines(text)];
             }
             else
             {
