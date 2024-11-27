@@ -18,7 +18,7 @@ public class JukeboxAnywhereButton : SimpleButton
     readonly MenuLabel trackName;
     readonly FSprite sprite = new("Futile_White", true);
 
-	public JukeboxAnywhereButton(Menu.Menu menu, MenuObject owner, Vector2 pos)
+	public JukeboxAnywhereButton(Menu.Menu menu, MenuObject owner, Vector2 pos, bool isSleepMenu = false)
 		: base(menu, owner, "", "JUKEBOX", pos, new(50f, 50f))
 	{
         // Get currently playing song
@@ -33,8 +33,8 @@ public class JukeboxAnywhereButton : SimpleButton
         this.trackName.label.color = this.nameColor;
         this.subObjects.Add(this.trackName);
         this.sprite.SetAnchor(0.5f, 0.5f);
-        this.sprite.x = this.pos.x + 25f;
-        this.sprite.y = this.pos.y + 25f;
+        this.sprite.x = this.pos.x + (isSleepMenu && menu.manager.rainWorld.options.resolution == 4 ? -43f : 25f);
+        this.sprite.y = this.pos.y + 27f;
         this.Container.AddChild(this.sprite);
         this.trackName.label.color = new Color(0.8f, 0.8f, 0.8f);
         this.sprite.color = new Color(0.8f, 0.8f, 0.8f);
@@ -69,8 +69,6 @@ public class JukeboxAnywhereButton : SimpleButton
     public override void GrafUpdate(float timeStacker)
     {
         base.GrafUpdate(timeStacker);
-        this.sprite.x = this.pos.x + 25f;
-        this.sprite.y = this.pos.y + 27f;
         for (int i = 0; i < 8; i++)
         {
             this.selectRect.sprites[i].color = this.MyColor(timeStacker);

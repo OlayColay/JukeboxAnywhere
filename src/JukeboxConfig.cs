@@ -12,6 +12,7 @@ namespace JukeboxAnywhere
         public static Configurable<bool> RequireExpeditionUnlocks;
         public static Configurable<bool> ModdedSongs;
         public static Configurable<bool> CleanSongNames;
+        public static Configurable<bool> JukeboxInSleepScreen;
 
         public JukeboxConfig()
         {
@@ -26,6 +27,10 @@ namespace JukeboxAnywhere
             CleanSongNames = config.Bind("cleanSongNames", true, new ConfigurableInfo("Attempt to fix capitalization and remove underscores from song names on the Jukebox", tags:
             [
                 "Clean Song Names"
+            ]));
+            JukeboxInSleepScreen = config.Bind("jukeboxInSleepScreen", true, new ConfigurableInfo("Enable Jukebox in Sleep and Death menus", tags:
+            [
+                "Jukebox in Sleep/Death Menus"
             ]));
         }
 
@@ -51,6 +56,7 @@ namespace JukeboxAnywhere
             AddCheckbox(RequireExpeditionUnlocks, 520f);
             AddCheckbox(ModdedSongs, 480f);
             AddCheckbox(CleanSongNames, 440f);
+            AddCheckbox(JukeboxInSleepScreen, 400f);
         }
 
         // Combines two flipped 'LinearGradient200's together to make a fancy looking divider.
