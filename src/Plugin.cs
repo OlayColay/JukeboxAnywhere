@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace JukeboxAnywhere
 {
-    [BepInPlugin(MOD_ID, "Jukebox Anywhere", "1.1.1")]
+    [BepInPlugin(MOD_ID, "Jukebox Anywhere", "1.3.0")]
     class Plugin : BaseUnityPlugin
     {
         public const string MOD_ID = "olaycolay.jukeboxanywhere";
@@ -121,7 +121,13 @@ namespace JukeboxAnywhere
             {
                 self.roundedRect.sprites[i].shader = menu.manager.rainWorld.Shaders["MenuTextCustom"];
             }
-        }
+
+            // Vanilla fix: If the game is 16:10 aspect ratio, adjust the record icon's position
+            if (menu.manager.rainWorld.options.resolution == 4)
+            {
+                self.sprite.x = (owner as MusicTrackContainer).pos.x + self.pos.x - 43f;
+            }
+    }
 
         private void MusicTrackButton_GrafUpdate(On.Menu.MusicTrackButton.orig_GrafUpdate orig, MusicTrackButton self, float timeStacker)
         {
@@ -131,6 +137,12 @@ namespace JukeboxAnywhere
                 self.unlocked = true;
             }
             orig(self, timeStacker);
+
+            // Vanilla fix: If the game is 16:10 aspect ratio, adjust the record icon's position
+            if (self.menu.manager.rainWorld.options.resolution == 4)
+            {
+                self.sprite.x = (self.owner as MusicTrackContainer).pos.x + self.pos.x - 43f;
+            }
 
             if (self.menu is not JukeboxAnywhere)
             {
@@ -152,6 +164,16 @@ namespace JukeboxAnywhere
             {
                 // For some reason, having a multiple of 10 songs in the trackList creates an extra empty page. This prevents that
                 self.maxPages--;
+            }
+
+            // Vanilla fix: If the game is 16:10 aspect ratio, adjust the background's position
+            if (self.menu.manager.rainWorld.options.resolution == 4)
+            {
+                FNode bgSprite = self.Container._childNodes.First(sprite => sprite.alpha == 0.55f);
+                if (bgSprite != null)
+                {
+                    bgSprite.x = pos.x - 83f;
+                }
             }
         }
 
