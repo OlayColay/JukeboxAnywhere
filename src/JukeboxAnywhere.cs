@@ -70,7 +70,19 @@ public class JukeboxAnywhere : ExpeditionJukebox
 
     public override void Update()
     {
+        bool newSong = false;
+        if (this.pendingSong == 0)
+        {
+            newSong = true;
+        }
+
         base.Update();
+
+        // Ensure song continues playing after death/cycle
+        if (newSong && this.manager.musicPlayer.song != null)
+        {
+            this.manager.musicPlayer.song.context = Music.MusicPlayer.MusicContext.StoryMode;
+        }
 
         // Update alpha and opening/closing status
         lastAlpha = currentAlpha;
