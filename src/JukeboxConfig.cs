@@ -20,7 +20,7 @@ namespace JukeboxAnywhere
             [
                 "Require Expedition Unlocks for Songs"
             ]));
-            ModdedSongs = config.Bind("moddedSongs", true, new ConfigurableInfo("Enable modded songs to be playable from Jukebox.", tags:
+            ModdedSongs = config.Bind("moddedSongs", true, new ConfigurableInfo("Enable modded songs to be playable from Jukebox. Restart game to take effect.", tags:
             [
                 "Enable Modded Songs"
             ]));

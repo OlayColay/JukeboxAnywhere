@@ -220,6 +220,7 @@ namespace JukeboxAnywhere
                 int initialCount = songs.Count + 1;
                 for (int i = 0; i < modSongNames.Count(); i++) 
                 {
+                    //JLogger.LogInfo(modSongNames[i] + ": " + songs.ContainsValue(modSongNames[i]));
                     if (!songs.ContainsValue(modSongNames[i]))
                     { 
                         songs["mus-" + Menu.Remix.ValueConverter.ConvertToString(i + initialCount)] = modSongNames[i];
@@ -294,7 +295,8 @@ namespace JukeboxAnywhere
             // Load list of songs in music folder
             modSongNames = AssetManager.ListDirectory("music" + Path.DirectorySeparatorChar.ToString() + "songs", false, false, true)
                 .Where(file => file.EndsWith(".mp3", StringComparison.OrdinalIgnoreCase) || file.EndsWith(".ogg", StringComparison.OrdinalIgnoreCase))
-                .Select(Path.GetFileNameWithoutExtension).ToArray();
+                .Select(Path.GetFileNameWithoutExtension).Distinct().ToArray();
+            //JLogger.LogInfo("Mod song names: " + string.Join(", ", modSongNames));
 
             // Get region acronyms
             string text = AssetManager.ResolveFilePath("World" + Path.DirectorySeparatorChar.ToString() + "regions.txt");
