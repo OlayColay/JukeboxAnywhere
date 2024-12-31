@@ -47,8 +47,8 @@ public class JukeboxAnywhere : ExpeditionJukebox
         Music.Song currentSong = manager.musicPlayer.song;
         if (currentSong != null)
         {
-            //RWCustom.Custom.Log("Currently playing song: " + currentSong.name);
-            //RWCustom.Custom.Log("Songs:" + string.Join(", ", ExpeditionProgression.GetUnlockedSongs().Select(kv => $"\n{kv.Key}: {kv.Value}")));
+            //Plugin.JLogger.LogInfo("Currently playing song: " + currentSong.name);
+            //Plugin.JLogger.LogInfo("Songs:" + string.Join(", ", ExpeditionProgression.GetUnlockedSongs().Select(kv => $"\n{kv.Key}: {kv.Value}")));
             string key = ExpeditionProgression.GetUnlockedSongs().FirstOrDefault(e => e.Value == currentSong.name).Key;
             if (key.IsNullOrWhiteSpace())
             {
@@ -56,7 +56,7 @@ public class JukeboxAnywhere : ExpeditionJukebox
             }
             else if (!int.TryParse(key.Substring(key.IndexOf('-') + 1), out selectedTrack))
             {
-                RWCustom.Custom.LogImportant("JukeboxAnywhere: currently playing track has invalid code (ie. mus-xx)!");
+                Plugin.JLogger.LogWarning("JukeboxAnywhere: currently playing track has invalid code (ie. mus-xx)!");
             }
             else
             {

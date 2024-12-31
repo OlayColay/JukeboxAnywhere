@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace JukeboxAnywhere
 {
-    [BepInPlugin(MOD_ID, "Jukebox Anywhere", "1.3.0")]
+    [BepInPlugin(MOD_ID, "Jukebox Anywhere", "1.3.1")]
     class Plugin : BaseUnityPlugin
     {
         public const string MOD_ID = "olaycolay.jukeboxanywhere";
@@ -74,7 +74,7 @@ namespace JukeboxAnywhere
         {
             orig(self);
 
-            RWCustom.Custom.Log("JukeboxAnywhere: Spawning jukebox button");
+            JLogger.LogInfo("JukeboxAnywhere: Spawning jukebox button");
             JukeboxAnywhereButton jukeBoxButton = new(self, self.pages[0], new Vector2(100f, self.continueButton.pos.y));
             self.pages[0].subObjects.Add(jukeBoxButton);
         }
@@ -110,7 +110,7 @@ namespace JukeboxAnywhere
                 return;
             }
 
-            RWCustom.Custom.Log("JukeboxAnywhere: Spawning jukebox button");
+            JLogger.LogInfo("JukeboxAnywhere: Spawning jukebox button");
             JukeboxAnywhereButton jukeboxButton = new(self, self.pages[0], new Vector2(
                 self.LeftHandButtonsPosXAdd + self.manager.rainWorld.options.SafeScreenOffset.x, 
                 Mathf.Max(self.manager.rainWorld.options.SafeScreenOffset.y, 15f) + self.continueButton.size.y + 15f

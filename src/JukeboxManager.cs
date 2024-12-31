@@ -74,6 +74,6 @@ public class JukeboxManager : MainLoopProcess
         while (pendingSong == curSong);
 
         instance.manager.musicPlayer.FadeOutAllSongs(0f);
-        RWCustom.Custom.Log("JukeboxAnywhere: Playing next shuffled song: " + pendingSong);
+        Plugin.JLogger.LogInfo("JukeboxAnywhere: Playing next shuffled song: " + pendingSong);
     }
 }

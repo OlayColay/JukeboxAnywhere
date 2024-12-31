@@ -109,7 +109,7 @@ public class JukeboxAnywhereButton : SimpleButton
             int selectedTrack = 0;
             if (!key.IsNullOrWhiteSpace() && !int.TryParse(key.Substring(key.IndexOf('-') + 1), out selectedTrack))
             {
-                Custom.LogImportant("JukeboxAnywhere: currently playing track has invalid code (ie. mus-xx)!");
+                Plugin.JLogger.LogWarning("JukeboxAnywhere: currently playing track has invalid code (ie. mus-xx)!");
             }
 
             if (selectedTrack > 0)
