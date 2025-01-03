@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using BepInEx;
 using BepInEx.Logging;
+using Expedition;
 using Menu;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
@@ -22,7 +23,6 @@ namespace JukeboxAnywhere
         public static string[] modSongNames;
         public static HashSet<string> regionAcronyms;
 
-
         public void OnEnable()
         {
             JLogger = Logger;
@@ -39,6 +39,7 @@ namespace JukeboxAnywhere
 
             On.Menu.MusicTrackButton.ctor += MusicTrackButton_ctor;
             On.Menu.MusicTrackButton.GrafUpdate += MusicTrackButton_GrafUpdate;
+            new Hook(typeof(MusicTrackButton).GetProperty(nameof(MusicTrackButton.AmISelected), System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance).GetGetMethod(), MusicTrackButton_get_AmISelected);
 
             On.Menu.MusicTrackContainer.ctor += MusicTrackContainer_ctor;
 
@@ -190,13 +191,18 @@ namespace JukeboxAnywhere
             }
         }
 
+        private bool MusicTrackButton_get_AmISelected(Func<MusicTrackButton, bool> orig, MusicTrackButton self)
+        {
+            return orig(self) && (self.menu.manager.musicPlayer.song?.name is string name && !ExpeditionProgression.GetUnlockedSongs().FirstOrDefault(e => e.Value == name).Key.IsNullOrWhiteSpace());
+        }
+
         private void MusicTrackContainer_ctor(On.Menu.MusicTrackContainer.orig_ctor orig, MusicTrackContainer self, Menu.Menu menu, MenuObject owner, Vector2 pos, List<string> trackFilenames)
         {
             orig(self, menu, owner, pos, trackFilenames);
 
+            // For some reason, having a multiple of 10 songs in the trackList creates an extra empty page. This prevents that
             if (self.trackList.Length > 0 && self.trackList.Length % 10 == 0)
             {
-                // For some reason, having a multiple of 10 songs in the trackList creates an extra empty page. This prevents that
                 self.maxPages--;
             }
 

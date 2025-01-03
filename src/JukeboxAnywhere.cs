@@ -47,7 +47,7 @@ public class JukeboxAnywhere : ExpeditionJukebox
         Music.Song currentSong = manager.musicPlayer.song;
         if (currentSong != null)
         {
-            //Plugin.JLogger.LogInfo("Currently playing song: " + currentSong.name);
+            Plugin.JLogger.LogInfo("Currently playing song: " + currentSong.name);
             //Plugin.JLogger.LogInfo("Songs:" + string.Join(", ", ExpeditionProgression.GetUnlockedSongs().Select(kv => $"\n{kv.Key}: {kv.Value}")));
             string key = ExpeditionProgression.GetUnlockedSongs().FirstOrDefault(e => e.Value == currentSong.name).Key;
             if (key.IsNullOrWhiteSpace())
