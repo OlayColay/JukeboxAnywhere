@@ -215,31 +215,36 @@ namespace JukeboxAnywhere
         {
             Dictionary<string, string> songs = orig();
             var songNamesLower = songs.Values.Select(s => s.ToLowerInvariant());
+            JLogger.LogInfo("GetUnlockedSongs;");
 
             if (JukeboxConfig.MiscSongs.Value)
             {
-                int initialCount = songs.Count;
-                for (int i = 0; i < miscSongNames.Count(); i++)
+                int initialCount = songs.Count + 1;
+                int i = 0;
+                foreach (string songName in miscSongNames)
                 {
                     //JLogger.LogInfo(miscSongNames[i] + ": " + songs.ContainsValue(miscSongNames[i]));
-                    if (!songNamesLower.Contains(miscSongNames[i].ToLowerInvariant()))
+                    if (!songNamesLower.Contains(songName.ToLowerInvariant()))
                     {
-                        songs["mus-" + (i + initialCount)] = miscSongNames[i];
-                        JLogger.LogInfo((i + initialCount) + ": " + songs["mus-" + (i + initialCount)]);
+                        songs["mus-" + (i + initialCount)] = songName;
+                        JLogger.LogInfo(i + ": " + (i + initialCount) + ": " + songs["mus-" + (i + initialCount)]);
+                        i++;
                     }
                 }
             }
 
             if (JukeboxConfig.ModdedSongs.Value)
             {
-                int initialCount = songs.Count;
-                for (int i = 0; i < modSongNames.Count(); i++) 
+                int initialCount = songs.Count + 1;
+                int i = 0;
+                foreach (string songName in modSongNames) 
                 {
                     //JLogger.LogInfo(modSongNames[i] + ": " + songs.ContainsValue(modSongNames[i]));
-                    if (!songNamesLower.Contains(modSongNames[i].ToLowerInvariant()))
+                    if (!songNamesLower.Contains(songName.ToLowerInvariant()))
                     { 
-                        songs["mus-" + (i + initialCount)] = modSongNames[i];
-                        JLogger.LogInfo((i + initialCount) + ": " + songs["mus-" + (i + initialCount)]);
+                        songs["mus-" + (i + initialCount)] = songName;
+                        JLogger.LogInfo(i + ": " + (i + initialCount) + ": " + songs["mus-" + (i + initialCount)]);
+                        i++;
                     }
                 }
             }
