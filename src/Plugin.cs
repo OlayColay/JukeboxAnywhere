@@ -14,7 +14,7 @@ using UnityEngine;
 
 namespace JukeboxAnywhere
 {
-    [BepInPlugin(MOD_ID, "Jukebox Anywhere", "1.3.1")]
+    [BepInPlugin(MOD_ID, "Jukebox Anywhere", "1.4.0")]
     class Plugin : BaseUnityPlugin
     {
         public const string MOD_ID = "olaycolay.jukeboxanywhere";
@@ -42,6 +42,7 @@ namespace JukeboxAnywhere
             On.Menu.MusicTrackButton.GrafUpdate += MusicTrackButton_GrafUpdate;
 
             On.Menu.MusicTrackContainer.ctor += MusicTrackContainer_ctor;
+            On.Menu.MusicTrackContainer.SwitchPage += MusicTrackContainer_SwitchPage;
 
             On.Music.MultiplayerDJ.PlayNext += MultiplayerDJ_PlayNext;
 
@@ -211,11 +212,31 @@ namespace JukeboxAnywhere
             }
         }
 
+        private void MusicTrackContainer_SwitchPage(On.Menu.MusicTrackContainer.orig_SwitchPage orig, MusicTrackContainer self)
+        {
+            orig(self);
+
+            if (JukeboxConfig.RequireExpeditionUnlocks.Value)
+            {
+                return;
+            }
+
+            if (self.trackList != null)
+            {
+                for (int i = 0; i < self.trackList.Length; i++)
+                {
+                    if (Mathf.FloorToInt((float)(i / 10)) == self.currentPage)
+                    {
+                        self.trackList[i].trackColor = new HSLColor(Mathf.InverseLerp(0f, (float)self.trackList.Length, (float)i), 1f, 0.7f).rgb;
+                    }
+                }
+            }
+        }
+
         private Dictionary<string, string> ExpeditionProgression_GetUnlockedSongs(On.Expedition.ExpeditionProgression.orig_GetUnlockedSongs orig)
         {
             Dictionary<string, string> songs = orig();
             var songNamesLower = songs.Values.Select(s => s.ToLowerInvariant());
-            JLogger.LogInfo("GetUnlockedSongs;");
 
             if (JukeboxConfig.MiscSongs.Value)
             {
@@ -227,7 +248,7 @@ namespace JukeboxAnywhere
                     if (!songNamesLower.Contains(songName.ToLowerInvariant()))
                     {
                         songs["mus-" + (i + initialCount)] = songName;
-                        JLogger.LogInfo(i + ": " + (i + initialCount) + ": " + songs["mus-" + (i + initialCount)]);
+                        //JLogger.LogInfo(i + ": " + (i + initialCount) + ": " + songs["mus-" + (i + initialCount)]);
                         i++;
                     }
                 }
@@ -243,7 +264,7 @@ namespace JukeboxAnywhere
                     if (!songNamesLower.Contains(songName.ToLowerInvariant()))
                     { 
                         songs["mus-" + (i + initialCount)] = songName;
-                        JLogger.LogInfo(i + ": " + (i + initialCount) + ": " + songs["mus-" + (i + initialCount)]);
+                        //JLogger.LogInfo(i + ": " + (i + initialCount) + ": " + songs["mus-" + (i + initialCount)]);
                         i++;
                     }
                 }
