@@ -39,7 +39,6 @@ namespace JukeboxAnywhere
 
             On.Menu.MusicTrackButton.ctor += MusicTrackButton_ctor;
             On.Menu.MusicTrackButton.GrafUpdate += MusicTrackButton_GrafUpdate;
-            new Hook(typeof(MusicTrackButton).GetProperty(nameof(MusicTrackButton.AmISelected), System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance).GetGetMethod(), MusicTrackButton_get_AmISelected);
 
             On.Menu.MusicTrackContainer.ctor += MusicTrackContainer_ctor;
 
@@ -179,6 +178,16 @@ namespace JukeboxAnywhere
                 self.sprite.x = (self.owner as MusicTrackContainer).pos.x + self.pos.x - 43f;
             }
 
+            // Don't show spinning record if the playing song isn't in the Jukebox's list
+            if (self.sprite.element.name == "mediadisc" && self.menu.manager.musicPlayer.song?.name is string name &&
+                ExpeditionProgression.GetUnlockedSongs().FirstOrDefault(e => e.Value == name).Key.IsNullOrWhiteSpace())
+            {
+                self.sprite.rotation = 0f;
+                self.sprite.SetElementByName("musicSymbol");
+
+                (self.menu as ExpeditionJukebox).currentSong.label.text = name;
+            }
+
             if (self.menu is not JukeboxAnywhere)
             {
                 return;
@@ -189,11 +198,6 @@ namespace JukeboxAnywhere
             {
                 self.sprite.y = (self.owner as MusicTrackContainer).pos.y + self.pos.y + self.menu.pages[0].pos.y + 25f;
             }
-        }
-
-        private bool MusicTrackButton_get_AmISelected(Func<MusicTrackButton, bool> orig, MusicTrackButton self)
-        {
-            return orig(self) && (self.menu.manager.musicPlayer.song?.name is string name && !ExpeditionProgression.GetUnlockedSongs().FirstOrDefault(e => e.Value == name).Key.IsNullOrWhiteSpace());
         }
 
         private void MusicTrackContainer_ctor(On.Menu.MusicTrackContainer.orig_ctor orig, MusicTrackContainer self, Menu.Menu menu, MenuObject owner, Vector2 pos, List<string> trackFilenames)
