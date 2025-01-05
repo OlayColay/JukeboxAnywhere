@@ -10,7 +10,7 @@ using System.Linq;
 namespace JukeboxAnywhere;
 public class JukeboxAnywhereButton : SimpleButton
 {
-    readonly string[] songList;
+    readonly Dictionary<string, string> songList;
     Song currentSong;
     int songNum;
     Color nameColor = Color.white;
@@ -22,13 +22,13 @@ public class JukeboxAnywhereButton : SimpleButton
 		: base(menu, owner, "", "JUKEBOX", pos, new(50f, 50f))
 	{
         // Get currently playing song
-        this.songList = [.. ExpeditionProgression.GetUnlockedSongs().Values];
+        this.songList = ExpeditionProgression.GetUnlockedSongs();
         UpdateCurrentSong();
 
         this.menuLabel.label.alignment = FLabelAlignment.Left;
         this.menuLabel.pos = new Vector2(-70f, 10f);
         this.menuLabel.label.color = this.trackColor;
-        this.trackName = new MenuLabel(menu, this, (currentSong != null && songNum >= 0) ? ExpeditionProgression.TrackName(songList[songNum]) : "", new Vector2(53f, 16f), default, false, null);
+        this.trackName = new MenuLabel(menu, this, (currentSong != null && songNum >= 0) ? ExpeditionProgression.TrackName(songList.Values.ToArray()[songNum]) : "", new Vector2(53f, 16f), default, false, null);
         this.trackName.label.alignment = FLabelAlignment.Left;
         this.trackName.label.color = this.nameColor;
         this.subObjects.Add(this.trackName);
@@ -53,10 +53,10 @@ public class JukeboxAnywhereButton : SimpleButton
     {
         base.Update();
         UpdateCurrentSong();
-        if (currentSong != null && songNum >= 0 && songNum < songList.Length)
+        if (currentSong != null && songNum >= 0 && songNum < songList.Count)
         {
             SetSize(new Vector2(240f, 50f));
-            trackName.text = ExpeditionProgression.TrackName(songList[songNum]);
+            trackName.text = ExpeditionProgression.TrackName(songList.Values.ToArray()[songNum]);
         }
         else
         {
@@ -105,7 +105,7 @@ public class JukeboxAnywhereButton : SimpleButton
         currentSong = menu.manager.musicPlayer?.song;
         if (currentSong != null)
         {
-            string key = ExpeditionProgression.GetUnlockedSongs().FirstOrDefault(e => e.Value.ToLowerInvariant() == currentSong.name.ToLowerInvariant()).Key;
+            string key = songList.FirstOrDefault(e => e.Value.ToLowerInvariant() == currentSong.name.ToLowerInvariant()).Key;
             int selectedTrack = 0;
             if (!key.IsNullOrWhiteSpace() && !int.TryParse(key.Substring(key.IndexOf('-') + 1), out selectedTrack))
             {

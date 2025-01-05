@@ -49,7 +49,7 @@ public class JukeboxAnywhere : ExpeditionJukebox
         {
             Plugin.JLogger.LogInfo("Currently playing song: " + currentSong.name);
             //Plugin.JLogger.LogInfo("Songs:" + string.Join(", ", ExpeditionProgression.GetUnlockedSongs().Select(kv => $"\n{kv.Key}: {kv.Value}")));
-            string key = ExpeditionProgression.GetUnlockedSongs().FirstOrDefault(e => e.Value.ToLowerInvariant() == currentSong.name.ToLowerInvariant()).Key;
+            string key = this.trackContainer.JA().unlockedSongs.FirstOrDefault(e => e.Value.ToLowerInvariant() == currentSong.name.ToLowerInvariant()).Key;
             if (key.IsNullOrWhiteSpace())
             {
                 selectedTrack = 0;

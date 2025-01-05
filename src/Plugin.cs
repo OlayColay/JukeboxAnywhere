@@ -60,21 +60,6 @@ namespace JukeboxAnywhere
             }
         }
 
-        private string ExpeditionProgression_TrackName(On.Expedition.ExpeditionProgression.orig_TrackName orig, string filename)
-        {
-            string text = orig(filename);
-
-            if (JukeboxConfig.CleanSongNames.Value)
-            {
-                if (miscSongNames.Contains(text))
-                {
-                    return text.ToUpperInvariant();
-                }
-                return ConvertToTitleCase(text);
-            }
-            return text;
-        }
-
         private void PauseMenu_SpawnExitContinueButtons(On.Menu.PauseMenu.orig_SpawnExitContinueButtons orig, PauseMenu self)
         {
             orig(self);
@@ -185,7 +170,7 @@ namespace JukeboxAnywhere
 
             // Don't show spinning record if the playing song isn't in the Jukebox's list
             if (self.sprite.element.name == "mediadisc" && self.menu.manager.musicPlayer.song?.name is string name &&
-                ExpeditionProgression.GetUnlockedSongs().FirstOrDefault(e => e.Value.ToLowerInvariant() == name.ToLowerInvariant()).Key.IsNullOrWhiteSpace())
+                (self.owner as MusicTrackContainer).JA().unlockedSongs.FirstOrDefault(e => e.Value.ToLowerInvariant() == name.ToLowerInvariant()).Key.IsNullOrWhiteSpace())
             {
                 self.sprite.rotation = 0f;
                 self.sprite.SetElementByName("musicSymbol");
@@ -231,7 +216,6 @@ namespace JukeboxAnywhere
             Dictionary<string, string> songs = orig();
             var songNamesLower = songs.Values.Select(s => s.ToLowerInvariant());
 
-            JLogger.LogInfo("Before: " + string.Join(", ", songs.Values));
             if (JukeboxConfig.MiscSongs.Value)
             {
                 int initialCount = songs.Count;
@@ -241,10 +225,10 @@ namespace JukeboxAnywhere
                     if (!songNamesLower.Contains(miscSongNames[i].ToLowerInvariant()))
                     {
                         songs["mus-" + (i + initialCount)] = miscSongNames[i];
+                        JLogger.LogInfo((i + initialCount) + ": " + songs["mus-" + (i + initialCount)]);
                     }
                 }
             }
-            JLogger.LogInfo("After: " + string.Join(", ", songs.Values));
 
             if (JukeboxConfig.ModdedSongs.Value)
             {
@@ -255,11 +239,27 @@ namespace JukeboxAnywhere
                     if (!songNamesLower.Contains(modSongNames[i].ToLowerInvariant()))
                     { 
                         songs["mus-" + (i + initialCount)] = modSongNames[i];
+                        JLogger.LogInfo((i + initialCount) + ": " + songs["mus-" + (i + initialCount)]);
                     }
                 }
             }
 
             return songs;
+        }
+
+        private string ExpeditionProgression_TrackName(On.Expedition.ExpeditionProgression.orig_TrackName orig, string filename)
+        {
+            string text = orig(filename);
+
+            if (JukeboxConfig.CleanSongNames.Value)
+            {
+                if (miscSongNames.Contains(text))
+                {
+                    return text.ToUpperInvariant();
+                }
+                return ConvertToTitleCase(text);
+            }
+            return text;
         }
 
         // Un-randomize Arena song when playing from Jukebox

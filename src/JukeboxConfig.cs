@@ -21,11 +21,11 @@ namespace JukeboxAnywhere
             [
                 "Require Expedition Unlocks for Songs"
             ]));
-            MiscSongs = config.Bind("miscSongs", false, new ConfigurableInfo("Enable misc. vanilla songs that aren't in the vanilla Jukebox, such as ambient pieces, to be playable from the Jukebox. Restart game to take effect.", tags:
+            MiscSongs = config.Bind("miscSongs", false, new ConfigurableInfo("Enable miscellaneous vanilla songs that aren't in the vanilla Jukebox, such as ambient pieces and region intros, to be playable from the Jukebox.", tags:
             [
                 "Enable Miscellaneous Songs"
             ]));
-            ModdedSongs = config.Bind("moddedSongs", true, new ConfigurableInfo("Enable modded songs to be playable from the Jukebox. Restart game to take effect.", tags:
+            ModdedSongs = config.Bind("moddedSongs", true, new ConfigurableInfo("Enable modded songs to be playable from the Jukebox.", tags:
             [
                 "Enable Modded Songs"
             ]));
