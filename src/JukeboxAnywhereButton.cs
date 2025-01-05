@@ -105,7 +105,7 @@ public class JukeboxAnywhereButton : SimpleButton
         currentSong = menu.manager.musicPlayer?.song;
         if (currentSong != null)
         {
-            string key = ExpeditionProgression.GetUnlockedSongs().FirstOrDefault(e => e.Value == currentSong.name).Key;
+            string key = ExpeditionProgression.GetUnlockedSongs().FirstOrDefault(e => e.Value.ToLowerInvariant() == currentSong.name.ToLowerInvariant()).Key;
             int selectedTrack = 0;
             if (!key.IsNullOrWhiteSpace() && !int.TryParse(key.Substring(key.IndexOf('-') + 1), out selectedTrack))
             {

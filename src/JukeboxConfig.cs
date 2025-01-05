@@ -10,6 +10,7 @@ namespace JukeboxAnywhere
     {
         public static JukeboxConfig Instance { get; } = new();
         public static Configurable<bool> RequireExpeditionUnlocks;
+        public static Configurable<bool> MiscSongs;
         public static Configurable<bool> ModdedSongs;
         public static Configurable<bool> CleanSongNames;
         public static Configurable<bool> JukeboxInSleepScreen;
@@ -20,7 +21,11 @@ namespace JukeboxAnywhere
             [
                 "Require Expedition Unlocks for Songs"
             ]));
-            ModdedSongs = config.Bind("moddedSongs", true, new ConfigurableInfo("Enable modded songs to be playable from Jukebox. Restart game to take effect.", tags:
+            MiscSongs = config.Bind("miscSongs", false, new ConfigurableInfo("Enable misc. vanilla songs that aren't in the vanilla Jukebox, such as ambient pieces, to be playable from the Jukebox. Restart game to take effect.", tags:
+            [
+                "Enable Miscellaneous Songs"
+            ]));
+            ModdedSongs = config.Bind("moddedSongs", true, new ConfigurableInfo("Enable modded songs to be playable from the Jukebox. Restart game to take effect.", tags:
             [
                 "Enable Modded Songs"
             ]));
@@ -54,9 +59,10 @@ namespace JukeboxAnywhere
             AddTitle(0);
             AddDivider(557f);
             AddCheckbox(RequireExpeditionUnlocks, 520f);
-            AddCheckbox(ModdedSongs, 480f);
-            AddCheckbox(CleanSongNames, 440f);
-            AddCheckbox(JukeboxInSleepScreen, 400f);
+            AddCheckbox(MiscSongs, 480f);
+            AddCheckbox(ModdedSongs, 440f);
+            AddCheckbox(CleanSongNames, 400f);
+            AddCheckbox(JukeboxInSleepScreen, 360f);
         }
 
         // Combines two flipped 'LinearGradient200's together to make a fancy looking divider.

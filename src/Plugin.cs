@@ -20,6 +20,7 @@ namespace JukeboxAnywhere
         public const string MOD_ID = "olaycolay.jukeboxanywhere";
         public static ManualLogSource JLogger;
 
+        public static string[] miscSongNames;
         public static string[] modSongNames;
         public static HashSet<string> regionAcronyms;
 
@@ -65,6 +66,10 @@ namespace JukeboxAnywhere
 
             if (JukeboxConfig.CleanSongNames.Value)
             {
+                if (miscSongNames.Contains(text))
+                {
+                    return text.ToUpperInvariant();
+                }
                 return ConvertToTitleCase(text);
             }
             return text;
@@ -180,7 +185,7 @@ namespace JukeboxAnywhere
 
             // Don't show spinning record if the playing song isn't in the Jukebox's list
             if (self.sprite.element.name == "mediadisc" && self.menu.manager.musicPlayer.song?.name is string name &&
-                ExpeditionProgression.GetUnlockedSongs().FirstOrDefault(e => e.Value == name).Key.IsNullOrWhiteSpace())
+                ExpeditionProgression.GetUnlockedSongs().FirstOrDefault(e => e.Value.ToLowerInvariant() == name.ToLowerInvariant()).Key.IsNullOrWhiteSpace())
             {
                 self.sprite.rotation = 0f;
                 self.sprite.SetElementByName("musicSymbol");
@@ -224,16 +229,32 @@ namespace JukeboxAnywhere
         private Dictionary<string, string> ExpeditionProgression_GetUnlockedSongs(On.Expedition.ExpeditionProgression.orig_GetUnlockedSongs orig)
         {
             Dictionary<string, string> songs = orig();
+            var songNamesLower = songs.Values.Select(s => s.ToLowerInvariant());
+
+            JLogger.LogInfo("Before: " + string.Join(", ", songs.Values));
+            if (JukeboxConfig.MiscSongs.Value)
+            {
+                int initialCount = songs.Count;
+                for (int i = 0; i < miscSongNames.Count(); i++)
+                {
+                    //JLogger.LogInfo(miscSongNames[i] + ": " + songs.ContainsValue(miscSongNames[i]));
+                    if (!songNamesLower.Contains(miscSongNames[i].ToLowerInvariant()))
+                    {
+                        songs["mus-" + (i + initialCount)] = miscSongNames[i];
+                    }
+                }
+            }
+            JLogger.LogInfo("After: " + string.Join(", ", songs.Values));
 
             if (JukeboxConfig.ModdedSongs.Value)
             {
-                int initialCount = songs.Count + 1;
+                int initialCount = songs.Count;
                 for (int i = 0; i < modSongNames.Count(); i++) 
                 {
                     //JLogger.LogInfo(modSongNames[i] + ": " + songs.ContainsValue(modSongNames[i]));
-                    if (!songs.ContainsValue(modSongNames[i]))
+                    if (!songNamesLower.Contains(modSongNames[i].ToLowerInvariant()))
                     { 
-                        songs["mus-" + Menu.Remix.ValueConverter.ConvertToString(i + initialCount)] = modSongNames[i];
+                        songs["mus-" + (i + initialCount)] = modSongNames[i];
                     }
                 }
             }
@@ -307,6 +328,9 @@ namespace JukeboxAnywhere
                 .Where(file => file.EndsWith(".mp3", StringComparison.OrdinalIgnoreCase) || file.EndsWith(".ogg", StringComparison.OrdinalIgnoreCase))
                 .Select(Path.GetFileNameWithoutExtension).Distinct().ToArray();
             //JLogger.LogInfo("Mod song names: " + string.Join(", ", modSongNames));
+            miscSongNames = AssetManager.ListDirectory("music" + Path.DirectorySeparatorChar.ToString() + "songs")
+                .Where(file => file.EndsWith(".mp3", StringComparison.OrdinalIgnoreCase))
+                .Select(Path.GetFileNameWithoutExtension).Distinct().Where(name => !modSongNames.Contains(name)).ToArray();
 
             // Get region acronyms
             string text = AssetManager.ResolveFilePath("World" + Path.DirectorySeparatorChar.ToString() + "regions.txt");
