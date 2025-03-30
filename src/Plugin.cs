@@ -35,8 +35,9 @@ namespace JukeboxAnywhere
             On.Menu.PauseMenu.Singal += PauseMenu_Singal;
             On.Menu.PauseMenu.Update += PauseMenu_Update;
 
-            On.Menu.SleepAndDeathScreen.ctor += SleepAndDeathScreen_ctor;
+            On.Menu.SleepAndDeathScreen.AddSubObjects += SleepAndDeathScreen_AddSubObjects;
             On.Menu.SleepAndDeathScreen.Singal += SleepAndDeathScreen_Singal;
+            On.Menu.SleepAndDeathScreen.Update += SleepAndDeathScreen_Update;
 
             On.Menu.MusicTrackButton.ctor += MusicTrackButton_ctor;
             On.Menu.MusicTrackButton.GrafUpdate += MusicTrackButton_GrafUpdate;
@@ -92,9 +93,9 @@ namespace JukeboxAnywhere
             }
         }
 
-        private void SleepAndDeathScreen_ctor(On.Menu.SleepAndDeathScreen.orig_ctor orig, SleepAndDeathScreen self, ProcessManager manager, ProcessManager.ProcessID ID)
+        private void SleepAndDeathScreen_AddSubObjects(On.Menu.SleepAndDeathScreen.orig_AddSubObjects orig, SleepAndDeathScreen self)
         {
-            orig(self, manager, ID);
+            orig(self);
 
             if (!JukeboxConfig.JukeboxInSleepScreen.Value)
             {
@@ -119,6 +120,16 @@ namespace JukeboxAnywhere
             else
             {
                 orig(self, sender, message);
+            }
+        }
+
+        private void SleepAndDeathScreen_Update(On.Menu.SleepAndDeathScreen.orig_Update orig, SleepAndDeathScreen self)
+        {
+            orig(self);
+
+            if (self.JA().jukeboxButton is JukeboxAnywhereButton jukeboxButton)
+            {
+                jukeboxButton.buttonBehav.greyedOut = self.ButtonsGreyedOut;
             }
         }
 
