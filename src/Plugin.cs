@@ -31,10 +31,13 @@ namespace JukeboxAnywhere
             On.RainWorld.OnModsInit += Extras.WrapInit(LoadResources);
 
             // Put your custom hooks here!
+            new Hook(typeof(Menu.Menu).GetProperty(nameof(Menu.Menu.FreezeMenuFunctions), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).GetGetMethod(true), Menu_get_FreezeMenuFunctions);
+            
             On.Menu.PauseMenu.SpawnExitContinueButtons += PauseMenu_SpawnExitContinueButtons;
             On.Menu.PauseMenu.Singal += PauseMenu_Singal;
             On.Menu.PauseMenu.Update += PauseMenu_Update;
 
+            new Hook(typeof(SleepAndDeathScreen).GetProperty(nameof(SleepAndDeathScreen.RevealMap), System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance).GetGetMethod(), SleepAndDeathScreen_get_RevealMap);
             On.Menu.SleepAndDeathScreen.AddSubObjects += SleepAndDeathScreen_AddSubObjects;
             On.Menu.SleepAndDeathScreen.Singal += SleepAndDeathScreen_Singal;
             On.Menu.SleepAndDeathScreen.Update += SleepAndDeathScreen_Update;
@@ -60,6 +63,12 @@ namespace JukeboxAnywhere
             {
                 Debug.LogError("JukeboxAnywhere: Could not apply ExpeditionJukebox_ctor IL Hook!\n" + ex.Message);
             }
+        }
+
+        private delegate bool orig_Menu_FreezeMenuFunctions(Menu.Menu self);
+        private bool Menu_get_FreezeMenuFunctions(orig_Menu_FreezeMenuFunctions orig, Menu.Menu self)
+        {
+            return orig(self) || ((self is PauseMenu or SleepAndDeathScreen) && self.manager.sideProcesses.OfType<JukeboxAnywhere>().Any());
         }
 
         private void PauseMenu_SpawnExitContinueButtons(On.Menu.PauseMenu.orig_SpawnExitContinueButtons orig, PauseMenu self)
@@ -91,6 +100,12 @@ namespace JukeboxAnywhere
             {
                 self.manager.sideProcesses.OfType<JukeboxAnywhere>().FirstOrDefault()?.Singal(self.pages[0], "BACK MUTED");
             }
+        }
+
+        public delegate bool orig_SleepAndDeathScreen_RevealMap(SleepAndDeathScreen self);
+        private static bool SleepAndDeathScreen_get_RevealMap(orig_SleepAndDeathScreen_RevealMap orig, SleepAndDeathScreen self)
+        {
+            return orig(self) && !self.manager.sideProcesses.OfType<JukeboxAnywhere>().Any();
         }
 
         private void SleepAndDeathScreen_AddSubObjects(On.Menu.SleepAndDeathScreen.orig_AddSubObjects orig, SleepAndDeathScreen self)
