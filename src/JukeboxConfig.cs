@@ -21,9 +21,9 @@ namespace JukeboxAnywhere
             [
                 "Require Expedition Unlocks for Songs"
             ]));
-            MiscSongs = config.Bind("miscSongs", false, new ConfigurableInfo("Enable miscellaneous vanilla songs that aren't in the vanilla Jukebox, such as ambient pieces and region intros, to be playable from the Jukebox.", tags:
+            MiscSongs = config.Bind("miscSongs", false, new ConfigurableInfo("Enable misc. vanilla songs that aren't in the vanilla Jukebox (such as ambient pieces and region intros) and Watcher songs to be playable from the Jukebox. Requries the Watcher DLC.", tags:
             [
-                "Enable Miscellaneous Songs"
+                "Enable Misc. Songs and Watcher Songs"
             ]));
             ModdedSongs = config.Bind("moddedSongs", true, new ConfigurableInfo("Enable modded songs to be playable from the Jukebox.", tags:
             [
@@ -63,6 +63,11 @@ namespace JukeboxAnywhere
             AddCheckbox(ModdedSongs, 440f);
             AddCheckbox(CleanSongNames, 400f);
             AddCheckbox(JukeboxInSleepScreen, 360f);
+
+            if (!ModManager.Watcher)
+            {
+                MiscSongs.BoundUIconfig.Hide();
+            }
         }
 
         // Combines two flipped 'LinearGradient200's together to make a fancy looking divider.

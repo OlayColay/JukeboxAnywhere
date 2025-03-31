@@ -14,7 +14,7 @@ using UnityEngine;
 
 namespace JukeboxAnywhere
 {
-    [BepInPlugin(MOD_ID, "Jukebox Anywhere", "1.4.0")]
+    [BepInPlugin(MOD_ID, "Jukebox Anywhere", "1.5.0")]
     class Plugin : BaseUnityPlugin
     {
         public const string MOD_ID = "olaycolay.jukeboxanywhere";
@@ -249,7 +249,7 @@ namespace JukeboxAnywhere
             Dictionary<string, string> songs = orig();
             var songNamesLower = songs.Values.Select(s => s.ToLowerInvariant());
 
-            if (JukeboxConfig.MiscSongs.Value)
+            if (JukeboxConfig.MiscSongs.Value && ModManager.Watcher)
             {
                 int initialCount = songs.Count + 1;
                 int i = 0;
@@ -361,13 +361,13 @@ namespace JukeboxAnywhere
             JukeboxConfig.RegisterOI();
 
             // Load list of songs in music folder
-            modSongNames = AssetManager.ListDirectory("music" + Path.DirectorySeparatorChar.ToString() + "songs", false, false, true)
+            modSongNames = [.. AssetManager.ListDirectory("music" + Path.DirectorySeparatorChar.ToString() + "songs", false, false, true)
                 .Where(file => file.EndsWith(".mp3", StringComparison.OrdinalIgnoreCase) || file.EndsWith(".ogg", StringComparison.OrdinalIgnoreCase))
-                .Select(Path.GetFileNameWithoutExtension).Distinct().ToArray();
+                .Select(Path.GetFileNameWithoutExtension).Distinct()];
             //JLogger.LogInfo("Mod song names: " + string.Join(", ", modSongNames));
-            miscSongNames = AssetManager.ListDirectory("music" + Path.DirectorySeparatorChar.ToString() + "songs")
+            miscSongNames = [.. AssetManager.ListDirectory("music" + Path.DirectorySeparatorChar.ToString() + "songs")
                 .Where(file => file.EndsWith(".mp3", StringComparison.OrdinalIgnoreCase))
-                .Select(Path.GetFileNameWithoutExtension).Distinct().Where(name => !modSongNames.Contains(name)).ToArray();
+                .Select(Path.GetFileNameWithoutExtension).Distinct().Where(name => !modSongNames.Contains(name))];
 
             // Get region acronyms
             string text = AssetManager.ResolveFilePath("World" + Path.DirectorySeparatorChar.ToString() + "regions.txt");
