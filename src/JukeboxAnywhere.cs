@@ -66,6 +66,21 @@ public class JukeboxAnywhere : ExpeditionJukebox
         }
 
         pages[0].pos.y = manager.rainWorld.options.ScreenSize.y + 100f;
+
+        // Threat Themes webapp button
+        if (JukeboxConfig.ThreatThemesButton.Value)
+        {
+            SimpleButton threatButton = new(this, pages[0], this.Translate("THREAT THEMES"), "THREAT", this.backButton.pos + new Vector2(45f, 0f), new Vector2(110f, 30f));
+            threatButton.nextSelectable[0] = this.backButton;
+            threatButton.nextSelectable[1] = threatButton.nextSelectable[2] = this.trackContainer.forwardPage;
+            threatButton.nextSelectable[3] = this.trackContainer.trackList[this.trackContainer.currentPage * 10];
+            pages[0].subObjects.Add(threatButton);
+
+            this.backButton.pos.x -= 80f;
+            this.backButton.SetSize(new Vector2(110f, 30f));
+            this.backButton.nextSelectable[2] = threatButton;
+            this.backButton.nextSelectable[3] = this.trackContainer.trackList[this.trackContainer.currentPage * 10];
+        }
     }
 
     public override void Update()
@@ -134,6 +149,10 @@ public class JukeboxAnywhere : ExpeditionJukebox
         else if (message == "SHUFFLE")
         {
             JukeboxManager.shuffleAnywhere = !JukeboxManager.shuffleAnywhere;
+        }
+        else if (message == "THREAT")
+        {
+            System.Diagnostics.Process.Start("https://threatmixer.netlify.app/");
         }
 
         base.Singal(sender, message);

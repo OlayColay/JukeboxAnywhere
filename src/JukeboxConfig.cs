@@ -14,6 +14,7 @@ namespace JukeboxAnywhere
         public static Configurable<bool> ModdedSongs;
         public static Configurable<bool> CleanSongNames;
         public static Configurable<bool> JukeboxInSleepScreen;
+        public static Configurable<bool> ThreatThemesButton;
 
         public JukeboxConfig()
         {
@@ -36,6 +37,10 @@ namespace JukeboxAnywhere
             JukeboxInSleepScreen = config.Bind("jukeboxInSleepScreen", true, new ConfigurableInfo("Enable Jukebox in Sleep and Death menus", tags:
             [
                 "Jukebox in Sleep/Death Menus"
+            ]));
+            ThreatThemesButton = config.Bind("threatThemesButton", true, new ConfigurableInfo("Enable Threat Themes Button that opens Rotwall's webapp in your browser", tags:
+            [
+                "Enable Threat Themes Webapp Button"
             ]));
         }
 
@@ -63,6 +68,7 @@ namespace JukeboxAnywhere
             AddCheckbox(ModdedSongs, 440f);
             AddCheckbox(CleanSongNames, 400f);
             AddCheckbox(JukeboxInSleepScreen, 360f);
+            AddCheckbox(ThreatThemesButton, 320f);
 
             if (!ModManager.Watcher)
             {
