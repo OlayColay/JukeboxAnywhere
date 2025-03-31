@@ -55,8 +55,6 @@ namespace JukeboxAnywhere
 
             new Hook(typeof(Page).GetProperty(nameof(Page.Selected), System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance).GetGetMethod(), Page_get_Selected);
 
-            On.ProcessManager.PostSwitchMainProcess += ProcessManager_PostSwitchMainProcess;
-
             try
             {
                 IL.Menu.ExpeditionJukebox.ctor += ExpeditionJukebox_ctor;
@@ -65,18 +63,6 @@ namespace JukeboxAnywhere
             {
                 Debug.LogError("JukeboxAnywhere: Could not apply ExpeditionJukebox_ctor IL Hook!\n" + ex.Message);
             }
-        }
-
-        private void ProcessManager_PostSwitchMainProcess(On.ProcessManager.orig_PostSwitchMainProcess orig, ProcessManager self, ProcessManager.ProcessID ID)
-        {
-            if (ID == ExpeditionEnums.ProcessID.ExpeditionJukebox)
-            {
-                self.currentMainLoop = new JukeboxAnywhere(self);
-                orig(self, null);
-                return;
-            }
-
-            orig(self, ID);
         }
 
         private delegate bool orig_Menu_FreezeMenuFunctions(Menu.Menu self);
