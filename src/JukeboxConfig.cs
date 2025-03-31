@@ -21,9 +21,9 @@ namespace JukeboxAnywhere
             [
                 "Require Expedition Unlocks for Songs"
             ]));
-            MiscSongs = config.Bind("miscSongs", false, new ConfigurableInfo("Enable misc. vanilla songs that aren't in the vanilla Jukebox (such as ambient pieces and region intros) and Watcher songs to be playable from the Jukebox. Requries the Watcher DLC.", tags:
+            MiscSongs = config.Bind("miscSongs", true, new ConfigurableInfo("Enable Watcher songs and misc. vanilla songs that aren't in the vanilla Jukebox (such as ambient pieces and region intros) to be playable from the Jukebox. Requries the Watcher DLC.", tags:
             [
-                "Enable Misc. Songs and Watcher Songs"
+                "Enable Watcher and Misc. Songs Songs"
             ]));
             ModdedSongs = config.Bind("moddedSongs", true, new ConfigurableInfo("Enable modded songs to be playable from the Jukebox.", tags:
             [
