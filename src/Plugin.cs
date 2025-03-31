@@ -121,7 +121,7 @@ namespace JukeboxAnywhere
             JukeboxAnywhereButton jukeboxButton = new(self, self.pages[0], new Vector2(
                 self.LeftHandButtonsPosXAdd + self.manager.rainWorld.options.SafeScreenOffset.x, 
                 Mathf.Max(self.manager.rainWorld.options.SafeScreenOffset.y, 15f) + self.continueButton.size.y + 15f
-            ), true);
+            ));
             self.pages[0].subObjects.Add(jukeboxButton);
         }
 
