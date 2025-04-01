@@ -119,9 +119,10 @@ public class JukeboxAnywhere : ExpeditionJukebox
             closing = false;
         }
 
-        if (opening)
+        if (this.threatButton.Selected || this.threatButton.MouseOver)
         {
-            return;
+            this.infoLabel.text = base.Translate("Opens Rotwall's Threatmixer in a web browser");
+            this.infoLabelFade = 1f;
         }
     }
 

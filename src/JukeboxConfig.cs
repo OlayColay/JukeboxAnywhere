@@ -24,7 +24,7 @@ namespace JukeboxAnywhere
             ]));
             MiscSongs = config.Bind("miscSongs", true, new ConfigurableInfo("Enable Watcher songs and misc. vanilla songs that aren't in the vanilla Jukebox (such as ambient pieces and region intros) to be playable from the Jukebox. Requries the Watcher DLC.", tags:
             [
-                "Enable Watcher and Misc. Songs Songs"
+                "Enable Watcher and Misc. Songs"
             ]));
             ModdedSongs = config.Bind("moddedSongs", true, new ConfigurableInfo("Enable modded songs to be playable from the Jukebox.", tags:
             [
