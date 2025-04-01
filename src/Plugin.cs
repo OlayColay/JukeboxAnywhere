@@ -242,6 +242,28 @@ namespace JukeboxAnywhere
         {
             orig(self);
 
+            // Vanilla fix: Give the top and bottom trackButtons of each page nextSelectables that make sense
+            int firstTrackOfPage = self.currentPage * 10;
+            if (self.menu is ExpeditionJukebox jukebox && jukebox.backButton != null)
+            {
+                self.trackList[firstTrackOfPage].nextSelectable[1] = jukebox.backButton;
+                jukebox.backButton.nextSelectable[3] = self.trackList[firstTrackOfPage];
+                if (self.menu is JukeboxAnywhere ja && ja.threatButton != null)
+                {
+                    ja.threatButton.nextSelectable[3] = self.trackList[firstTrackOfPage];
+                }
+            }
+            if (firstTrackOfPage + 9 > self.trackList.Length)
+            {
+                self.trackList[self.trackList.Length - 1].nextSelectable[3] = self.backPage;
+                self.backPage.nextSelectable[1] = self.forwardPage.nextSelectable[1] = self.trackList[self.trackList.Length - 1];
+            }
+            else
+            {
+                self.trackList[firstTrackOfPage + 9].nextSelectable[3] = self.backPage;
+                self.backPage.nextSelectable[1] = self.forwardPage.nextSelectable[1] = self.trackList[firstTrackOfPage + 9];
+            }
+
             if (JukeboxConfig.RequireExpeditionUnlocks.Value)
             {
                 return;

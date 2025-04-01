@@ -17,6 +17,8 @@ public class JukeboxAnywhere : ExpeditionJukebox
     public float targetAlpha;
     public float uAlpha;
 
+    public SimpleButton threatButton;
+
     protected FSprite darkSprite;
 
     public JukeboxAnywhere(ProcessManager manager) : base(manager)
@@ -70,7 +72,7 @@ public class JukeboxAnywhere : ExpeditionJukebox
         // Threat Themes webapp button
         if (JukeboxConfig.ThreatThemesButton.Value)
         {
-            SimpleButton threatButton = new(this, pages[0], this.Translate("THREAT THEMES"), "THREAT", this.backButton.pos + new Vector2(45f, 0f), new Vector2(110f, 30f));
+            threatButton = new(this, pages[0], this.Translate("THREAT THEMES"), "THREAT", this.backButton.pos + new Vector2(45f, 0f), new Vector2(110f, 30f));
             threatButton.nextSelectable[0] = this.backButton;
             threatButton.nextSelectable[1] = threatButton.nextSelectable[2] = this.trackContainer.forwardPage;
             threatButton.nextSelectable[3] = this.trackContainer.trackList[this.trackContainer.currentPage * 10];
@@ -78,9 +80,14 @@ public class JukeboxAnywhere : ExpeditionJukebox
 
             this.backButton.pos.x -= 80f;
             this.backButton.SetSize(new Vector2(110f, 30f));
+            this.backButton.nextSelectable[1] = this.trackContainer.backPage;
             this.backButton.nextSelectable[2] = threatButton;
-            this.backButton.nextSelectable[3] = this.trackContainer.trackList[this.trackContainer.currentPage * 10];
         }
+
+        // Other button navigation fixes for the first loaded page
+        this.backButton.nextSelectable[3] = this.trackContainer.trackList[this.trackContainer.currentPage * 10];
+        this.trackContainer.forwardPage.nextSelectable[3] = threatButton ?? backButton;
+        this.trackContainer.trackList[this.trackContainer.currentPage * 10].nextSelectable[1] = this.backButton;
     }
 
     public override void Update()
