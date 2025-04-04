@@ -43,6 +43,11 @@ public class JukeboxManager : MainLoopProcess
             return;
         }
 
+        if (this.manager.musicPlayer.song.subTracks[0].source.clip == null)
+        {
+            return;
+        }
+
         TimeSpan timeSpan = TimeSpan.FromSeconds((double)this.manager.musicPlayer.song.subTracks[0].source.time);
         TimeSpan timeSpan2 = TimeSpan.FromSeconds((double)this.manager.musicPlayer.song.subTracks[0].source.clip.length);
         float num = Mathf.InverseLerp(0f, (float)timeSpan2.TotalMilliseconds, (float)timeSpan.TotalMilliseconds) * 100f;

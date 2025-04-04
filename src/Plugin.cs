@@ -14,7 +14,7 @@ using UnityEngine;
 
 namespace JukeboxAnywhere
 {
-    [BepInPlugin(MOD_ID, "Jukebox Anywhere", "1.6.1")]
+    [BepInPlugin(MOD_ID, "Jukebox Anywhere", "1.6.2")]
     class Plugin : BaseUnityPlugin
     {
         public const string MOD_ID = "olaycolay.jukeboxanywhere";
@@ -253,7 +253,7 @@ namespace JukeboxAnywhere
                     ja.threatButton.nextSelectable[3] = self.trackList[firstTrackOfPage];
                 }
             }
-            if (firstTrackOfPage + 9 > self.trackList.Length)
+            if (firstTrackOfPage + 10 >= self.trackList.Length)
             {
                 self.trackList[self.trackList.Length - 1].nextSelectable[3] = self.backPage;
                 self.backPage.nextSelectable[1] = self.forwardPage.nextSelectable[1] = self.trackList[self.trackList.Length - 1];
