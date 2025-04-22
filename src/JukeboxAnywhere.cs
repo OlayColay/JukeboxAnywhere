@@ -119,7 +119,7 @@ public class JukeboxAnywhere : ExpeditionJukebox
             closing = false;
         }
 
-        if (this.threatButton.Selected || this.threatButton.MouseOver)
+        if (this.threatButton != null && (this.threatButton.Selected || this.threatButton.MouseOver))
         {
             this.infoLabel.text = base.Translate("Opens Rotwall's Threatmixer in a web browser");
             this.infoLabelFade = 1f;

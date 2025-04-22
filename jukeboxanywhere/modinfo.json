@@ -1,7 +1,7 @@
 ﻿{
 	"id": "olaycolay.jukeboxanywhere",
 	"name": "Jukebox Anywhere",
-	"version": "1.6.2",
+	"version": "1.6.3",
 	"authors": "OlayColay",
 	"description": "Use the Expedition Jukebox during gameplay!",
 	"requirements": [ "expedition" ],
