@@ -61,10 +61,11 @@ namespace JukeboxAnywhere
             try
             {
                 IL.Menu.ExpeditionJukebox.ctor += ExpeditionJukebox_ctor;
+                IL.Menu.MainMenu.AddMainMenuButton += MainMenu_AddMainMenuButton;
             }
             catch (Exception ex)
             {
-                Debug.LogError("JukeboxAnywhere: Could not apply ExpeditionJukebox_ctor IL Hook!\n" + ex.Message);
+                Debug.LogError("JukeboxAnywhere: Could not apply IL Hooks!\n" + ex.Message);
             }
         }
 
@@ -176,6 +177,27 @@ namespace JukeboxAnywhere
             else
             {
                 orig(self, sender, message);
+            }
+        }
+
+        private void MainMenu_AddMainMenuButton(ILContext il)
+        {
+            ILCursor c = new(il);
+
+            try
+            {
+                // Move cursor after int num = 8
+                if (!c.TryGotoNext(MoveType.After, i => i.MatchLdcI4(8)))
+                {
+                    throw new Exception("Failed to match IL for MainMenu_ctor1!");
+                }
+
+                c.MoveAfterLabels();
+                c.EmitDelegate((int _) => 12);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("JukeboxAnywhere: Could not emit MainMenu_AddMainMenuButton ILs!\n" + ex.Message);
             }
         }
 
