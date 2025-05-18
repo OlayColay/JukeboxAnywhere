@@ -14,7 +14,7 @@ using UnityEngine;
 
 namespace JukeboxAnywhere
 {
-    [BepInPlugin(MOD_ID, "Jukebox Anywhere", "1.6.3")]
+    [BepInPlugin(MOD_ID, "Jukebox Anywhere", "1.7.0")]
     class Plugin : BaseUnityPlugin
     {
         public const string MOD_ID = "olaycolay.jukeboxanywhere";
@@ -41,6 +41,9 @@ namespace JukeboxAnywhere
             On.Menu.SleepAndDeathScreen.AddSubObjects += SleepAndDeathScreen_AddSubObjects;
             On.Menu.SleepAndDeathScreen.Singal += SleepAndDeathScreen_Singal;
             On.Menu.SleepAndDeathScreen.Update += SleepAndDeathScreen_Update;
+
+            On.Menu.MainMenu.ctor += MainMenu_ctor;
+            On.Menu.MainMenu.Singal += MainMenu_Singal;
 
             On.Menu.MusicTrackButton.ctor += MusicTrackButton_ctor;
             On.Menu.MusicTrackButton.GrafUpdate += MusicTrackButton_GrafUpdate;
@@ -145,6 +148,34 @@ namespace JukeboxAnywhere
             if (self.JA().jukeboxButton is JukeboxAnywhereButton jukeboxButton)
             {
                 jukeboxButton.buttonBehav.greyedOut = self.ButtonsGreyedOut;
+            }
+        }
+
+        private void MainMenu_ctor(On.Menu.MainMenu.orig_ctor orig, MainMenu self, ProcessManager manager, bool showRegionSpecificBkg)
+        {
+            orig(self, manager, showRegionSpecificBkg);
+
+            JLogger.LogInfo("JukeboxAnywhere: Spawning MainMenu jukebox button");
+            float buttonWidth = MainMenu.GetButtonWidth(self.CurrLang);
+            Vector2 pos = new(683f - buttonWidth / 2f, 0f);
+            Vector2 size = new(buttonWidth, 30f);
+            self.AddMainMenuButton(new(self, self.pages[0], "JUKEBOX", "JUKEBOX", pos, size), () =>
+            {
+                self.PlaySound(SoundID.MENU_Switch_Page_Out);
+                self.manager.sideProcesses.Add(new JukeboxAnywhere(self.manager));
+            }, 2);
+        }
+
+        private void MainMenu_Singal(On.Menu.MainMenu.orig_Singal orig, MainMenu self, MenuObject sender, string message)
+        {
+            if (message == "JUKEBOX")
+            {
+                self.PlaySound(SoundID.MENU_Switch_Page_Out);
+                self.manager.sideProcesses.Add(new JukeboxAnywhere(self.manager));
+            }
+            else
+            {
+                orig(self, sender, message);
             }
         }
 

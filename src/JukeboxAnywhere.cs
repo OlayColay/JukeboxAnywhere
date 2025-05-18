@@ -84,6 +84,8 @@ public class JukeboxAnywhere : ExpeditionJukebox
             this.backButton.nextSelectable[2] = threatButton;
         }
 
+        this.favouriteButton.pos.x += 100f;
+
         // Other button navigation fixes for the first loaded page
         this.backButton.nextSelectable[3] = this.trackContainer.trackList[this.trackContainer.currentPage * 10];
         this.trackContainer.forwardPage.nextSelectable[3] = threatButton ?? backButton;
