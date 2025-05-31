@@ -182,15 +182,18 @@ namespace JukeboxAnywhere
         {
             orig(self, manager, showRegionSpecificBkg);
 
-            JLogger.LogInfo("JukeboxAnywhere: Spawning MainMenu jukebox button");
-            float buttonWidth = MainMenu.GetButtonWidth(self.CurrLang);
-            Vector2 pos = new(683f - buttonWidth / 2f, 0f);
-            Vector2 size = new(buttonWidth, 30f);
-            self.AddMainMenuButton(new(self, self.pages[0], "JUKEBOX", "JUKEBOX", pos, size), () =>
+            if (JukeboxConfig.JukeboxInMainMenu.Value)
             {
-                self.PlaySound(SoundID.MENU_Switch_Page_Out);
-                self.manager.sideProcesses.Add(new JukeboxAnywhere(self.manager));
-            }, 2);
+                JLogger.LogInfo("JukeboxAnywhere: Spawning MainMenu jukebox button");
+                float buttonWidth = MainMenu.GetButtonWidth(self.CurrLang);
+                Vector2 pos = new(683f - buttonWidth / 2f, 0f);
+                Vector2 size = new(buttonWidth, 30f);
+                self.AddMainMenuButton(new(self, self.pages[0], "JUKEBOX", "JUKEBOX", pos, size), () =>
+                {
+                    self.PlaySound(SoundID.MENU_Switch_Page_Out);
+                    self.manager.sideProcesses.Add(new JukeboxAnywhere(self.manager));
+                }, 2);
+            }
         }
 
         private void MainMenu_Singal(On.Menu.MainMenu.orig_Singal orig, MainMenu self, MenuObject sender, string message)
