@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using BepInEx;
 using BepInEx.Logging;
 using Expedition;
@@ -24,6 +24,8 @@ namespace JukeboxAnywhere
         public static string[] modSongNames;
         public static HashSet<string> regionAcronyms;
 
+        public static string mainMenuSong = "";
+
         public void OnEnable()
         {
             JLogger = Logger;
@@ -32,7 +34,10 @@ namespace JukeboxAnywhere
 
             // Put your custom hooks here!
             new Hook(typeof(Menu.Menu).GetProperty(nameof(Menu.Menu.FreezeMenuFunctions), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).GetGetMethod(true), Menu_get_FreezeMenuFunctions);
-            
+
+            On.Expedition.ExpeditionCoreFile.ToString += ExpeditionCoreFile_ToString;
+            On.Expedition.ExpeditionCoreFile.FromString += ExpeditionCoreFile_FromString;
+
             On.Menu.PauseMenu.SpawnExitContinueButtons += PauseMenu_SpawnExitContinueButtons;
             On.Menu.PauseMenu.Singal += PauseMenu_Singal;
             On.Menu.PauseMenu.Update += PauseMenu_Update;
@@ -53,6 +58,8 @@ namespace JukeboxAnywhere
 
             On.Music.MultiplayerDJ.PlayNext += MultiplayerDJ_PlayNext;
 
+            On.Music.IntroRollMusic.ctor += IntroRollMusic_ctor;
+
             On.Expedition.ExpeditionProgression.GetUnlockedSongs += ExpeditionProgression_GetUnlockedSongs;
             On.Expedition.ExpeditionProgression.TrackName += ExpeditionProgression_TrackName;
 
@@ -72,7 +79,26 @@ namespace JukeboxAnywhere
         private delegate bool orig_Menu_FreezeMenuFunctions(Menu.Menu self);
         private bool Menu_get_FreezeMenuFunctions(orig_Menu_FreezeMenuFunctions orig, Menu.Menu self)
         {
-            return orig(self) || ((self is PauseMenu or SleepAndDeathScreen) && self.manager.sideProcesses.OfType<JukeboxAnywhere>().Any());
+            return orig(self) || ((self is PauseMenu or SleepAndDeathScreen or MainMenu) && self.manager.sideProcesses.OfType<JukeboxAnywhere>().Any());
+        }
+
+        private void ExpeditionCoreFile_FromString(On.Expedition.ExpeditionCoreFile.orig_FromString orig, ExpeditionCoreFile self, string saveString)
+        {
+            orig(self, saveString);
+
+            string[] array = Regex.Split(saveString, "<expC>");
+            foreach (string s in array)
+            {
+                if (s.StartsWith("MAINMENUSONG:"))
+                {
+                    mainMenuSong = Regex.Split(s, ":")[1];
+                }
+            }
+        }
+
+        private string ExpeditionCoreFile_ToString(On.Expedition.ExpeditionCoreFile.orig_ToString orig, ExpeditionCoreFile self)
+        {
+            return orig(self) + (mainMenuSong == "" ? "" : ("<expC>MAINMENUSONG:" + mainMenuSong));
         }
 
         private void PauseMenu_SpawnExitContinueButtons(On.Menu.PauseMenu.orig_SpawnExitContinueButtons orig, PauseMenu self)
@@ -334,6 +360,25 @@ namespace JukeboxAnywhere
             }
         }
 
+        private void IntroRollMusic_ctor(On.Music.IntroRollMusic.orig_ctor orig, Music.IntroRollMusic self, Music.MusicPlayer musicPlayer)
+        {
+            orig(self, musicPlayer);
+
+            if (mainMenuSong is not "RW_8 - Sundown" and not "")
+            {
+                for (int i = 0; i < self.subTracks.Count; i++)
+                {
+                    if (self.subTracks[i].trackName == "RW_8 - Sundown")
+                    {
+                        self.subTracks[i] = new(self, 1, mainMenuSong)
+                        {
+                            volume = 1f
+                        };
+                    }
+                }
+            }
+        }
+
         private Dictionary<string, string> ExpeditionProgression_GetUnlockedSongs(On.Expedition.ExpeditionProgression.orig_GetUnlockedSongs orig)
         {
             Dictionary<string, string> songs = orig();
@@ -469,6 +514,9 @@ namespace JukeboxAnywhere
             {
                 regionAcronyms = ["No Regions"];
             }
+
+            // Load atlas
+            Futile.atlasManager.LoadAtlas("atlases/jukeboxanywhere");
         }
 
         // Define a list of words that should not be capitalized in a title
