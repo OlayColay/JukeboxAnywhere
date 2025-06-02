@@ -318,6 +318,13 @@ namespace JukeboxAnywhere
                     bgSprite.x = pos.x - 83f;
                 }
             }
+
+            // Option to sort tracks alphabetically
+            if (JukeboxConfig.AlphabeticalOrder.Value)
+            {
+                self.trackList = [.. self.trackList.OrderByDescending(track => track.unlocked).ThenBy(track => track.trackName.myText)];
+                self.SwitchPage();
+            }
         }
 
         private void MusicTrackContainer_SwitchPage(On.Menu.MusicTrackContainer.orig_SwitchPage orig, MusicTrackContainer self)
@@ -452,7 +459,7 @@ namespace JukeboxAnywhere
             return orig(self) && (self.menu is not PauseMenu || !self.menu.manager.sideProcesses.OfType<JukeboxAnywhere>().Any());
         }
 
-        private void ExpeditionJukebox_ctor(MonoMod.Cil.ILContext il)
+        private void ExpeditionJukebox_ctor(ILContext il)
         {
             ILCursor c = new(il);
             ILLabel brSLabel = null;

@@ -10,6 +10,7 @@ namespace JukeboxAnywhere
     {
         public static JukeboxConfig Instance { get; } = new();
         public static Configurable<bool> RequireExpeditionUnlocks;
+        public static Configurable<bool> AlphabeticalOrder;
         public static Configurable<bool> MiscSongs;
         public static Configurable<bool> ModdedSongs;
         public static Configurable<bool> CleanSongNames;
@@ -22,6 +23,10 @@ namespace JukeboxAnywhere
             RequireExpeditionUnlocks = config.Bind("requireExpeditionUnlocks", true, new ConfigurableInfo("Only access songs that are unlocked from Expedition goals.", tags:
             [
                 "Require Expedition Unlocks for Songs"
+            ]));
+            AlphabeticalOrder = config.Bind("alphabeticalOrder", false, new ConfigurableInfo("Sort the Jukebox's tracks by alphabetical order.", tags:
+            [
+                "Sort Tracks Alphabetically"
             ]));
             MiscSongs = config.Bind("miscSongs", true, new ConfigurableInfo("Enable Watcher songs and misc. vanilla songs that aren't in the vanilla Jukebox (such as ambient pieces and region intros) to be playable from the Jukebox. Requries the Watcher DLC.", tags:
             [
@@ -69,12 +74,13 @@ namespace JukeboxAnywhere
             AddTitle(0);
             AddDivider(557f);
             AddCheckbox(RequireExpeditionUnlocks, 520f);
-            AddCheckbox(MiscSongs, 480f);
-            AddCheckbox(ModdedSongs, 440f);
-            AddCheckbox(CleanSongNames, 400f);
-            AddCheckbox(JukeboxInSleepScreen, 360f);
-            AddCheckbox(JukeboxInMainMenu, 320f);
-            AddCheckbox(ThreatThemesButton, 280f);
+            AddCheckbox(AlphabeticalOrder, 480f);
+            AddCheckbox(MiscSongs, 440f);
+            AddCheckbox(ModdedSongs, 400f);
+            AddCheckbox(CleanSongNames, 360f);
+            AddCheckbox(JukeboxInSleepScreen, 320f);
+            AddCheckbox(JukeboxInMainMenu, 280f);
+            AddCheckbox(ThreatThemesButton, 240f);
 
             if (!ModManager.Watcher)
             {
