@@ -49,8 +49,7 @@ public class JukeboxAnywhere : ExpeditionJukebox
         // Re-select playing track if one is already playing
         if (manager.musicPlayer.song != null)
         {
-            string currentSong = (manager.currentMainLoop.ID == ProcessManager.ProcessID.MainMenu && manager.musicPlayer.song.name == "TitleRollRain")
-                ? (Plugin.mainMenuSong == "" ? "RW_8 - Sundown" : Plugin.mainMenuSong) : manager.musicPlayer.song.name;
+            string currentSong = manager.musicPlayer.song.name;
 
             Plugin.JLogger.LogInfo("Currently playing song: " + currentSong);
             //Plugin.JLogger.LogInfo("Songs:" + string.Join(", ", ExpeditionProgression.GetUnlockedSongs().Select(kv => $"\n{kv.Key}: {kv.Value}")));
@@ -66,6 +65,7 @@ public class JukeboxAnywhere : ExpeditionJukebox
             else
             {
                 selectedTrack--;
+                this.currentSong.label.text = ExpeditionProgression.TrackName(this.songList[this.selectedTrack]);
             }
             this.trackContainer.GoToPlayingTrackPage();
         }

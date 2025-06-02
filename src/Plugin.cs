@@ -10,6 +10,7 @@ using Menu;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
+using Music;
 using UnityEngine;
 
 namespace JukeboxAnywhere
@@ -56,9 +57,12 @@ namespace JukeboxAnywhere
             On.Menu.MusicTrackContainer.ctor += MusicTrackContainer_ctor;
             On.Menu.MusicTrackContainer.SwitchPage += MusicTrackContainer_SwitchPage;
 
-            On.Music.MultiplayerDJ.PlayNext += MultiplayerDJ_PlayNext;
-
             On.Music.IntroRollMusic.ctor += IntroRollMusic_ctor;
+            On.Music.IntroRollMusic.StartPlaying += IntroRollMusic_StartPlaying;
+            On.Music.IntroRollMusic.StartMusic += IntroRollMusic_StartMusic;
+            On.Music.IntroRollMusic.Update += IntroRollMusic_Update;
+
+            On.Music.MultiplayerDJ.PlayNext += MultiplayerDJ_PlayNext;
 
             On.Expedition.ExpeditionProgression.GetUnlockedSongs += ExpeditionProgression_GetUnlockedSongs;
             On.Expedition.ExpeditionProgression.TrackName += ExpeditionProgression_TrackName;
@@ -98,7 +102,7 @@ namespace JukeboxAnywhere
 
         private string ExpeditionCoreFile_ToString(On.Expedition.ExpeditionCoreFile.orig_ToString orig, ExpeditionCoreFile self)
         {
-            return orig(self) + (mainMenuSong == "" ? "" : ("<expC>MAINMENUSONG:" + mainMenuSong));
+            return orig(self) + (mainMenuSong.IsNullOrWhiteSpace() ? "" : ("<expC>MAINMENUSONG:" + mainMenuSong));
         }
 
         private void PauseMenu_SpawnExitContinueButtons(On.Menu.PauseMenu.orig_SpawnExitContinueButtons orig, PauseMenu self)
@@ -370,25 +374,6 @@ namespace JukeboxAnywhere
             }
         }
 
-        private void IntroRollMusic_ctor(On.Music.IntroRollMusic.orig_ctor orig, Music.IntroRollMusic self, Music.MusicPlayer musicPlayer)
-        {
-            orig(self, musicPlayer);
-
-            if (mainMenuSong is not "RW_8 - Sundown" and not "")
-            {
-                for (int i = 0; i < self.subTracks.Count; i++)
-                {
-                    if (self.subTracks[i].trackName == "RW_8 - Sundown")
-                    {
-                        self.subTracks[i] = new(self, 1, mainMenuSong)
-                        {
-                            volume = 1f
-                        };
-                    }
-                }
-            }
-        }
-
         private Dictionary<string, string> ExpeditionProgression_GetUnlockedSongs(On.Expedition.ExpeditionProgression.orig_GetUnlockedSongs orig)
         {
             Dictionary<string, string> songs = orig();
@@ -442,6 +427,43 @@ namespace JukeboxAnywhere
                 return ConvertToTitleCase(text);
             }
             return text;
+        }
+
+        // Much of this crap is just for getting the currentSong text and visualizer working from Main Menu
+        // Since they only look at the first subtrack, which is normally TITLEROLLRAIN. We switch that here
+        private void IntroRollMusic_ctor(On.Music.IntroRollMusic.orig_ctor orig, IntroRollMusic self, MusicPlayer musicPlayer)
+        {
+            orig(self, musicPlayer);
+
+            self.subTracks.Reverse();
+            string mainMenuSongLower = mainMenuSong?.ToLowerInvariant();
+            bool songExists = !mainMenuSong.IsNullOrWhiteSpace() && 
+                ExpeditionProgression.GetUnlockedSongs().Any(pair => pair.Value.ToLowerInvariant().Contains(mainMenuSongLower));
+            self.name = self.subTracks[0].trackName = songExists ? mainMenuSong : "RW_8 - Sundown";
+        }
+
+        public void IntroRollMusic_StartPlaying(On.Music.IntroRollMusic.orig_StartPlaying orig, IntroRollMusic self)
+        {
+            self.startedPlaying = true;
+            self.subTracks[1].StartPlaying();
+        }
+
+        public void IntroRollMusic_StartMusic(On.Music.IntroRollMusic.orig_StartMusic orig, IntroRollMusic self)
+        {
+            if (self.musicTrackStarted)
+            {
+                return;
+            }
+            self.musicTrackStarted = true;
+            self.subTracks[0].StartPlaying();
+        }
+
+        public void IntroRollMusic_Update(On.Music.IntroRollMusic.orig_Update orig, IntroRollMusic self)
+        {
+            orig(self);
+
+            self.subTracks[0].volume = 1f;
+            self.subTracks[1].volume = self.rainVol;
         }
 
         // Un-randomize Arena song when playing from Jukebox
