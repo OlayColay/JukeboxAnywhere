@@ -15,7 +15,7 @@ using UnityEngine;
 
 namespace JukeboxAnywhere
 {
-    [BepInPlugin(MOD_ID, "Jukebox Anywhere", "1.7.0")]
+    [BepInPlugin(MOD_ID, "Jukebox Anywhere", "1.8.0")]
     class Plugin : BaseUnityPlugin
     {
         public const string MOD_ID = "olaycolay.jukeboxanywhere";
@@ -204,7 +204,7 @@ namespace JukeboxAnywhere
         {
             if (message == "JUKEBOX")
             {
-                self.PlaySound(SoundID.MENU_Switch_Page_Out);
+                self.PlaySound(SoundID.MENU_Switch_Page_In);
                 self.manager.sideProcesses.Add(new JukeboxAnywhere(self.manager));
             }
             else
@@ -335,6 +335,11 @@ namespace JukeboxAnywhere
         {
             orig(self);
 
+            if (self.trackList == null)
+            {
+                return;
+            }
+
             // Vanilla fix: Give the top and bottom trackButtons of each page nextSelectables that make sense
             int firstTrackOfPage = self.currentPage * 10;
             if (self.menu is ExpeditionJukebox jukebox && jukebox.backButton != null)
@@ -357,19 +362,25 @@ namespace JukeboxAnywhere
                 self.backPage.nextSelectable[1] = self.forwardPage.nextSelectable[1] = self.trackList[firstTrackOfPage + 9];
             }
 
+            // Move inactive tracks to further below menu so they don't show during opening/closing
+            for (int i = 0; i < self.trackList.Length; i++)
+            {
+                if (Mathf.FloorToInt((float)(i / 10)) != self.currentPage)
+                {
+                    self.trackList[i].pos.y = -20000f;
+                }
+            }
+
             if (JukeboxConfig.RequireExpeditionUnlocks.Value)
             {
                 return;
             }
 
-            if (self.trackList != null)
+            for (int i = 0; i < self.trackList.Length; i++)
             {
-                for (int i = 0; i < self.trackList.Length; i++)
+                if (Mathf.FloorToInt((float)(i / 10)) == self.currentPage)
                 {
-                    if (Mathf.FloorToInt((float)(i / 10)) == self.currentPage)
-                    {
-                        self.trackList[i].trackColor = new HSLColor(Mathf.InverseLerp(0f, (float)self.trackList.Length, (float)i), 1f, 0.7f).rgb;
-                    }
+                    self.trackList[i].trackColor = new HSLColor(Mathf.InverseLerp(0f, (float)self.trackList.Length, (float)i), 1f, 0.7f).rgb;
                 }
             }
         }

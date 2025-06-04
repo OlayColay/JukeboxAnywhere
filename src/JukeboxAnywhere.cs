@@ -20,7 +20,7 @@ public class JukeboxAnywhere : ExpeditionJukebox
     public SimpleButton threatButton;
     public SymbolButton favouriteButtonMainMenu;
 
-    protected FSprite darkSprite;
+    public FSprite trackContainerBackground;
 
     public JukeboxAnywhere(ProcessManager manager) : base(manager)
     {
@@ -29,22 +29,17 @@ public class JukeboxAnywhere : ExpeditionJukebox
         this.repeat = JukeboxManager.repeatAnywhere;
         this.shuffle = JukeboxManager.shuffleAnywhere;
 
-        // Black background
-        this.darkSprite = new FSprite("pixel", true)
-        {
-            color = new Color(0f, 0f, 0f),
-            anchorX = 0f,
-            anchorY = 0f,
-            scaleX = manager.rainWorld.screenSize.x + 2f,
-            scaleY = manager.rainWorld.screenSize.x + 2f,
-            x = -1f,
-            y = -1f,
-            alpha = 0f
-        };
-        this.pages[0].Container.AddChildAtIndex(this.darkSprite, 0);
-
         opening = true;
         targetAlpha = 1f;
+
+        FNode trackContainerBg = this.trackContainer.Container._childNodes.First(sprite => sprite.alpha == 0.55f);
+        if (trackContainerBg != null)
+        {
+            this.trackContainerBackground = trackContainerBg as FSprite;
+            this.trackContainerBackground.y = this.trackContainer.pos.y - 680f;
+        }
+
+        this.trackContainer.borderRect.pos.y = -680f;
 
         // Re-select playing track if one is already playing
         if (manager.musicPlayer.song != null)
@@ -70,7 +65,7 @@ public class JukeboxAnywhere : ExpeditionJukebox
             this.trackContainer.GoToPlayingTrackPage();
         }
 
-        pages[0].pos.y = manager.rainWorld.options.ScreenSize.y + 100f;
+        pages[0].pos.y = manager.rainWorld.options.ScreenSize.y + 300f;
 
         // Threat Themes webapp button
         if (JukeboxConfig.ThreatThemesButton.Value)
@@ -161,10 +156,15 @@ public class JukeboxAnywhere : ExpeditionJukebox
         if (opening || closing)
         {
             uAlpha = Mathf.Pow(Mathf.Max(0f, Mathf.Lerp(lastAlpha, currentAlpha, timeStacker)), 1.5f);
-            darkSprite.alpha = uAlpha * 0.3f;
             jukeboxLogo.y = pages[0].pos.y + 618f;
+            this.shade.alpha = uAlpha * 0.8f;
+            if (this.trackContainerBackground != null)
+            {
+                this.trackContainerBackground.alpha = uAlpha * 0.55f;
+                this.trackContainerBackground.y = this.pages[0].pos.y - 15f;
+            }
         }
-        pages[0].pos.y = Mathf.Lerp(manager.rainWorld.options.ScreenSize.y + 100f, 0.01f, (uAlpha < 0.999f) ? uAlpha : 1f);
+        pages[0].pos.y = Mathf.Lerp(manager.rainWorld.options.ScreenSize.y + 300f, 0.01f, (uAlpha < 0.999f) ? uAlpha : 1f);
 
         if (Plugin.mainMenuSong == this.songList[this.selectedTrack])
         {
