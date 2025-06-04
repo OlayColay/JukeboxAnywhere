@@ -2,6 +2,7 @@
 using Expedition;
 using Menu;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -212,7 +213,125 @@ public class JukeboxAnywhere : ExpeditionJukebox
             Plugin.mainMenuSong = "";
             this.PlaySound(SoundID.MENU_Button_Press_Init);
         }
+        if (message == "PREV" && JukeboxConfig.AlphabeticalOrder.Value)
+        {
+            this.manager.musicPlayer.FadeOutAllSongs(0f);
+            this.PreviousTrack(this.shuffle);
+            this.seekBar.SetProgress(0f);
+            this.currentSong.label.text = ExpeditionProgression.TrackName(this.songList[this.selectedTrack]);
+            this.pendingSong = 1;
+            this.trackContainer.GoToPlayingTrackPage();
+            base.PlaySound(SoundID.MENU_Button_Press_Init);
+            return;
+        }
+        if (message == "NEXT" && JukeboxConfig.AlphabeticalOrder.Value)
+        {
+            this.manager.musicPlayer.FadeOutAllSongs(0f);
+            this.NextTrack(this.shuffle);
+            this.seekBar.SetProgress(0f);
+            this.currentSong.label.text = ExpeditionProgression.TrackName(this.songList[this.selectedTrack]);
+            this.pendingSong = 1;
+            this.trackContainer.GoToPlayingTrackPage();
+            base.PlaySound(SoundID.MENU_Button_Press_Init);
+            return;
+        }
 
         base.Singal(sender, message);
+    }
+
+    public new void NextTrack(bool shuffle)
+    {
+        MusicTrackButton[] trackList = this.trackContainer.trackList;
+        int num = -1;
+        for (int i = 0; i < trackList.Length; i++)
+        {
+            if (trackList[i].AmISelected)
+            {
+                num = i;
+                break;
+            }
+        }
+        if (shuffle)
+        {
+            List<int> list = [];
+            for (int i = 0; i < trackList.Length; i++)
+            {
+                if (trackList[i].unlocked && i != num)
+                {
+                    list.Add(i);
+                }
+            }
+            num = ((list.Count > 0) ? list[UnityEngine.Random.Range(0, list.Count)] : num);
+            this.selectedTrack = this.songList.Select((value, idx) => new { value, idx })
+                .FirstOrDefault(songName => ExpeditionProgression.TrackName(songName.value) == trackList[num].trackName.text)?.idx ?? -1;
+            return;
+        }
+        for (int j = num + 1; j < trackList.Length; j++)
+        {
+            if (trackList[j].unlocked)
+            {
+                this.selectedTrack = this.songList.Select((value, idx) => new { value, idx })
+                    .FirstOrDefault(songName => ExpeditionProgression.TrackName(songName.value) == trackList[j].trackName.text)?.idx ?? -1;
+                return;
+            }
+        }
+        for (int k = 0; k < num; k++)
+        {
+            if (trackList[k].unlocked)
+            {
+                this.selectedTrack = this.songList.Select((value, idx) => new { value, idx })
+                    .FirstOrDefault(songName => ExpeditionProgression.TrackName(songName.value) == trackList[k].trackName.text)?.idx ?? -1;
+                return;
+            }
+        }
+        this.selectedTrack = num;
+    }
+
+    public new void PreviousTrack(bool shuffle)
+    {
+        MusicTrackButton[] trackList = this.trackContainer.trackList;
+        int num = -1;
+        for (int i = 0; i < trackList.Length; i++)
+        {
+            if (trackList[i].AmISelected)
+            {
+                num = i;
+                break;
+            }
+        }
+        if (shuffle)
+        {
+            List<int> list = [];
+            for (int i = 0; i < trackList.Length; i++)
+            {
+                if (trackList[i].unlocked && i != num)
+                {
+                    list.Add(i);
+                }
+            }
+            num = ((list.Count > 0) ? list[UnityEngine.Random.Range(0, list.Count)] : num);
+            this.selectedTrack = this.songList.Select((value, idx) => new { value, idx })
+                .FirstOrDefault(songName => ExpeditionProgression.TrackName(songName.value) == trackList[num].trackName.text)?.idx ?? -1;
+            return;
+        }
+        for (int j = num - 1; j > 0; j--)
+        {
+            if (trackList[j].unlocked)
+            {
+                this.selectedTrack = this.songList.Select((value, idx) => new { value, idx })
+                    .FirstOrDefault(songName => ExpeditionProgression.TrackName(songName.value) == trackList[j].trackName.text)?.idx ?? -1;
+                return;
+            }
+        }
+        for (int k = trackList.Length - 1; k > num; k--)
+        {
+            if (trackList[k].unlocked)
+            {
+                this.selectedTrack = this.songList.Select((value, idx) => new { value, idx })
+                    .FirstOrDefault(songName => ExpeditionProgression.TrackName(songName.value) == trackList[k].trackName.text)?.idx ?? -1;
+                return;
+            }
+        }
+        this.selectedTrack = num;
     }
 }
