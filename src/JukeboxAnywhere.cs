@@ -200,7 +200,7 @@ public class JukeboxAnywhere : ExpeditionJukebox
         }
         else if (message == "THREAT")
         {
-            System.Diagnostics.Process.Start("https://threatmixer.netlify.app/");
+            System.Diagnostics.Process.Start("https://rotwall72.github.io/Threatmixer/");
         }
         else if (message == "FAVOURITEMAINMENU")
         {

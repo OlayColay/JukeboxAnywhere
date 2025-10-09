@@ -15,7 +15,7 @@ using UnityEngine;
 
 namespace JukeboxAnywhere
 {
-    [BepInPlugin(MOD_ID, "Jukebox Anywhere", "1.8.0")]
+    [BepInPlugin(MOD_ID, "Jukebox Anywhere", "1.8.1")]
     class Plugin : BaseUnityPlugin
     {
         public const string MOD_ID = "olaycolay.jukeboxanywhere";
