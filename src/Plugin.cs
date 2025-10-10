@@ -466,11 +466,16 @@ namespace JukeboxAnywhere
         {
             orig(self, musicPlayer);
 
+            Dictionary<string, string> unlockedSongs = ExpeditionProgression.GetUnlockedSongs();
+            string defaultSong = JukeboxConfig.RandomMenuSong.Value ?
+                unlockedSongs.ElementAt(UnityEngine.Random.Range(0, unlockedSongs.Count)).Value :
+                "RW_8 - Sundown";
+
             self.subTracks.Reverse();
             string mainMenuSongLower = mainMenuSong?.ToLowerInvariant();
             bool songExists = !mainMenuSong.IsNullOrWhiteSpace() && 
-                ExpeditionProgression.GetUnlockedSongs().Any(pair => pair.Value.ToLowerInvariant().Contains(mainMenuSongLower));
-            self.name = self.subTracks[0].trackName = songExists ? mainMenuSong : "RW_8 - Sundown";
+                unlockedSongs.Any(pair => pair.Value.ToLowerInvariant().Contains(mainMenuSongLower));
+            self.name = self.subTracks[0].trackName = songExists ? mainMenuSong : defaultSong;
         }
 
         public void IntroRollMusic_StartPlaying(On.Music.IntroRollMusic.orig_StartPlaying orig, IntroRollMusic self)

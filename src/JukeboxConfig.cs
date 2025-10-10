@@ -17,6 +17,7 @@ namespace JukeboxAnywhere
         public static Configurable<bool> JukeboxInSleepScreen;
         public static Configurable<bool> JukeboxInMainMenu;
         public static Configurable<bool> ThreatThemesButton;
+        public static Configurable<bool> RandomMenuSong;
 
         public JukeboxConfig()
         {
@@ -36,21 +37,25 @@ namespace JukeboxAnywhere
             [
                 "Enable Modded Songs"
             ]));
-            CleanSongNames = config.Bind("cleanSongNames", true, new ConfigurableInfo("Attempt to fix capitalization and remove underscores from song names on the Jukebox", tags:
+            CleanSongNames = config.Bind("cleanSongNames", true, new ConfigurableInfo("Attempt to fix capitalization and remove underscores from song names on the Jukebox.", tags:
             [
                 "Clean Song Names"
             ]));
-            JukeboxInSleepScreen = config.Bind("jukeboxInSleepScreen", true, new ConfigurableInfo("Enable Jukebox in Sleep and Death menus", tags:
+            JukeboxInSleepScreen = config.Bind("jukeboxInSleepScreen", true, new ConfigurableInfo("Enable Jukebox in Sleep and Death menus.", tags:
             [
                 "Jukebox in Sleep/Death Menus"
             ]));
-            JukeboxInMainMenu = config.Bind("jukeboxInMainMenu", true, new ConfigurableInfo("Enable Jukebox in main menu", tags:
+            JukeboxInMainMenu = config.Bind("jukeboxInMainMenu", true, new ConfigurableInfo("Enable Jukebox in main menu.", tags:
             [
                 "Jukebox in Main Menu"
             ]));
-            ThreatThemesButton = config.Bind("threatThemesButton", true, new ConfigurableInfo("Enable Threat Themes Button that opens Rotwall's webapp in your browser", tags:
+            ThreatThemesButton = config.Bind("threatThemesButton", true, new ConfigurableInfo("Enable Threat Themes Button that opens Rotwall's webapp in your browser.", tags:
             [
                 "Enable Threat Themes Webapp Button"
+            ]));
+            RandomMenuSong = config.Bind("randomMenuSong", false, new ConfigurableInfo("Randomize Main Menu theme song if none are selected. If unchecked, \"Sundown\" plays instead.", tags:
+            [
+                "Randomize Main Menu Theme if None Selected"
             ]));
         }
 
@@ -81,6 +86,7 @@ namespace JukeboxAnywhere
             AddCheckbox(JukeboxInSleepScreen, 320f);
             AddCheckbox(JukeboxInMainMenu, 280f);
             AddCheckbox(ThreatThemesButton, 240f);
+            AddCheckbox(RandomMenuSong, 200f);
 
             if (!ModManager.Watcher)
             {
