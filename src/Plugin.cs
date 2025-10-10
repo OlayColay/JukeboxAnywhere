@@ -15,7 +15,7 @@ using UnityEngine;
 
 namespace JukeboxAnywhere
 {
-    [BepInPlugin(MOD_ID, "Jukebox Anywhere", "1.8.1")]
+    [BepInPlugin(MOD_ID, "Jukebox Anywhere", "1.9.0")]
     class Plugin : BaseUnityPlugin
     {
         public const string MOD_ID = "olaycolay.jukeboxanywhere";
@@ -351,7 +351,7 @@ namespace JukeboxAnywhere
                     ja.threatButton.nextSelectable[3] = self.trackList[firstTrackOfPage];
                 }
             }
-            if (firstTrackOfPage + 10 >= self.trackList.Length)
+            if (firstTrackOfPage + 9 >= self.trackList.Length)
             {
                 self.trackList[self.trackList.Length - 1].nextSelectable[3] = self.backPage;
                 self.backPage.nextSelectable[1] = self.forwardPage.nextSelectable[1] = self.trackList[self.trackList.Length - 1];
@@ -360,6 +360,26 @@ namespace JukeboxAnywhere
             {
                 self.trackList[firstTrackOfPage + 9].nextSelectable[3] = self.backPage;
                 self.backPage.nextSelectable[1] = self.forwardPage.nextSelectable[1] = self.trackList[firstTrackOfPage + 9];
+            }
+
+            // Fix nextSelectables of trackButtons when using alphabetical order
+            if (JukeboxConfig.AlphabeticalOrder.Value)
+            {
+                self.trackList[firstTrackOfPage].nextSelectable[3] = self.trackList[firstTrackOfPage + 1];
+                for (int i = firstTrackOfPage + 1; i < self.trackList.Length - 1 && i < firstTrackOfPage + 9; i++)
+                {
+                    // for loop only affects trackButtons in middle
+                    self.trackList[i].nextSelectable[1] = self.trackList[i - 1];
+                    self.trackList[i].nextSelectable[3] = self.trackList[i + 1];
+                }
+                if (firstTrackOfPage + 9 >= self.trackList.Length)
+                {
+                    self.trackList[self.trackList.Length - 1].nextSelectable[1] = self.trackList[self.trackList.Length - 2];
+                }
+                else
+                {
+                    self.trackList[firstTrackOfPage + 9].nextSelectable[1] = self.trackList[firstTrackOfPage + 8];
+                }
             }
 
             // Move inactive tracks to further below menu so they don't show during opening/closing
