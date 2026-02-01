@@ -15,7 +15,7 @@ using UnityEngine;
 
 namespace JukeboxAnywhere
 {
-    [BepInPlugin(MOD_ID, "Jukebox Anywhere", "1.9.1")]
+    [BepInPlugin(MOD_ID, "Jukebox Anywhere", "1.9.2")]
     class Plugin : BaseUnityPlugin
     {
         public const string MOD_ID = "olaycolay.jukeboxanywhere";
@@ -565,9 +565,14 @@ namespace JukeboxAnywhere
 
             // Load list of songs in music folder
             modSongNames = [.. AssetManager.ListDirectory("music" + Path.DirectorySeparatorChar.ToString() + "songs", false, false, true)
-                .Where(file => 
-                    file.EndsWith(".mp3", StringComparison.OrdinalIgnoreCase) || 
-                    file.EndsWith(".ogg", StringComparison.OrdinalIgnoreCase))
+                .Where(file =>
+                {
+                    string song = Path.GetFileName(file);
+                    return (song.EndsWith(".mp3", StringComparison.OrdinalIgnoreCase) ||
+                    song.EndsWith(".ogg", StringComparison.OrdinalIgnoreCase)) &&
+                    !song.StartsWith("RWTW_", StringComparison.OrdinalIgnoreCase) &&
+                    !song.StartsWith("BM_", StringComparison.OrdinalIgnoreCase);
+                })
                 .Select(Path.GetFileNameWithoutExtension).Distinct()];
             //JLogger.LogInfo("Mod song names: " + string.Join(", ", modSongNames));
             miscSongNames = [.. AssetManager.ListDirectory("music" + Path.DirectorySeparatorChar.ToString() + "songs")
